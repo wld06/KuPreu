@@ -1,7 +1,5 @@
 package com.kupreu.api.entity;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -11,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,27 +16,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "shopping_list")
+@Table(name = "shopping_list_item")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShoppingList {
+public class ShoppingListItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
-    private String name;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Integer quantity;
 
     @ManyToOne
-    @JoinColumn(name = "id_user", nullable = false)
-    private User user;
+    @JoinColumn(name = "id_list", nullable = false)
+    private ShoppingList shoppingList;
 
-    @OneToMany(mappedBy = "shoppingList")
-    private List<ShoppingListItem> items;
+    @ManyToOne
+    @JoinColumn(name = "id_product", nullable = false)
+    private Product product;
 }
