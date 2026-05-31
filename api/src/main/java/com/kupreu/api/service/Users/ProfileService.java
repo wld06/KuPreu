@@ -1,4 +1,4 @@
-package com.kupreu.api.service;
+package com.kupreu.api.service.Users;
 
 import java.util.UUID;
 

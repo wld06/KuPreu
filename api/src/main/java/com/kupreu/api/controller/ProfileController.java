@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kupreu.api.DTOs.Profile.PasswordRequest;
 import com.kupreu.api.DTOs.Profile.ProfileRequest;
 import com.kupreu.api.DTOs.Profile.ProfileResponse;
-import com.kupreu.api.service.ProfileService;
+import com.kupreu.api.service.Users.ProfileService;
 
 import lombok.RequiredArgsConstructor;
 
