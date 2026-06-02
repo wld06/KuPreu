@@ -18,6 +18,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,12 +31,16 @@ import com.kupreu.api.DTOs.Category.CategoryRequest;
 import com.kupreu.api.DTOs.Category.CategoryResponse;
 import com.kupreu.api.config.security.JwtAuthFilter;
 import com.kupreu.api.config.security.JwtProvider;
+import com.kupreu.api.config.security.RateLimitFilter;
 import com.kupreu.api.config.security.SecurityConfig;
 import com.kupreu.api.service.CategoryService;
 
 import tools.jackson.databind.json.JsonMapper;
 
-@WebMvcTest(CategoryController.class)
+@WebMvcTest(controllers = CategoryController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = RateLimitFilter.class))
 @Import({SecurityConfig.class, JwtAuthFilter.class, GlobalExceptionHandler.class})
 class CategoryControllerTest {
 

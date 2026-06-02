@@ -1,11 +1,13 @@
 package com.kupreu.api.config.security;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.kupreu.api.config.RateLimitProperties;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
@@ -18,24 +20,24 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-
 @Component
 @Order(1)
 public class RateLimitFilter extends OncePerRequestFilter{
     private final ProxyManager<byte[]> buckets;
+    private final RateLimitProperties props;
 
-    public RateLimitFilter(RedisClient redisClient){
+    public RateLimitFilter(RedisClient redisClient, RateLimitProperties props) {
         this.buckets = LettuceBasedProxyManager
                         .builderFor(redisClient)
                         .build();
+        this.props = props;
     }
 
     private BucketConfiguration bucketConfig(){
         return BucketConfiguration.builder()
                 .addLimit(Bandwidth.builder()
-                            .capacity(20)
-                            .refillGreedy(20, Duration.ofMinutes(1))
+                            .capacity(props.getCapacity())
+                            .refillGreedy(props.getRefillToken(), props.getRefillPeriod())
                             .build())
                 .build();
     }

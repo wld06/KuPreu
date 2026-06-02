@@ -11,6 +11,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,12 +24,16 @@ import com.kupreu.api.DTOs.LoginRequest;
 import com.kupreu.api.DTOs.RegisterRequest;
 import com.kupreu.api.config.security.JwtAuthFilter;
 import com.kupreu.api.config.security.JwtProvider;
+import com.kupreu.api.config.security.RateLimitFilter;
 import com.kupreu.api.config.security.SecurityConfig;
 import com.kupreu.api.service.AuthService;
 
 import tools.jackson.databind.json.JsonMapper;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest(controllers = AuthController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = RateLimitFilter.class))
 @Import({SecurityConfig.class, JwtAuthFilter.class, GlobalExceptionHandler.class})
 class AuthControllerTest {
 
@@ -54,7 +60,7 @@ class AuthControllerTest {
 
     @Test
     void register_validRequest_returns200WithToken() throws Exception {
-        RegisterRequest req = new RegisterRequest("user@test.com", "Ana", "García", "ana", "pass123");
+        RegisterRequest req = new RegisterRequest("user@test.com", "Ana", "García", "ana", "Pass123!");
         AuthResponse res = AuthResponse.builder()
                 .id(FAKE_ID).token(FAKE_TOKEN)
                 .email("user@test.com").username("ana")
@@ -74,7 +80,7 @@ class AuthControllerTest {
 
     @Test
     void register_duplicateEmail_returns500() throws Exception {
-        RegisterRequest req = new RegisterRequest("dup@test.com", "Ana", "García", "ana", "pass123");
+        RegisterRequest req = new RegisterRequest("dup@test.com", "Ana", "García", "ana", "Pass123!");
 
         when(authService.register(any(RegisterRequest.class)))
                 .thenThrow(new RuntimeException("Email already in use"));
