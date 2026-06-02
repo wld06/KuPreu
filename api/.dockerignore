@@ -1,0 +1,11 @@
+target/
+.git/
+.gitignore
+.idea/
+.vscode/
+*.iml
+HELP.md
+ENDPOINTS.txt
+application-local.properties
+.env
+.env.*

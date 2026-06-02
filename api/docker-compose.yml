@@ -1,14 +1,33 @@
-version: '3.8'
-
 services:
+  api:
+    build: .
+    container_name: kupreu-api
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-kupreu}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USERNAME: ${MYSQL_USER:-kupreu}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-kupreu}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - app-network
+
   mysql:
     image: mysql:8.0
     container_name: mysql-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: kupreu
-      MYSQL_USER: kupreu
-      MYSQL_PASSWORD: kupreu
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-kupreu}
+      MYSQL_USER: ${MYSQL_USER:-kupreu}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-kupreu}
     ports:
       - "3306:3306"
     volumes:
@@ -16,8 +35,19 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis:7
+    container_name: kupreu-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
 volumes:
   mysql_data:
+  redis_data:
 
 networks:
   app-network:

@@ -18,6 +18,8 @@ import com.kupreu.api.DTOs.Profile.ProfileRequest;
 import com.kupreu.api.DTOs.Profile.ProfileResponse;
 import com.kupreu.api.service.Users.ProfileService;
 
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -39,12 +41,12 @@ public class ProfileController {
 
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProfileResponse> getProfileByEmail(@RequestBody ProfileRequest request){
+    public ResponseEntity<ProfileResponse> getProfileByEmail(@Valid @RequestBody ProfileRequest request){
         return ResponseEntity.ok(profileService.getProfileByEmail(request.email));
     }
 
     @PutMapping("/update/password")
-    public ResponseEntity<String> updatePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody PasswordRequest request){
+    public ResponseEntity<String> updatePassword(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody PasswordRequest request){
         profileService.updatePassword(userDetails, request);
         return ResponseEntity.ok("Updated");
     }

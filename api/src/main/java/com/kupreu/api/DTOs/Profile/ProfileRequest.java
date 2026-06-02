@@ -1,8 +1,12 @@
 package com.kupreu.api.DTOs.Profile;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class ProfileRequest {
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
     public String email;
 }

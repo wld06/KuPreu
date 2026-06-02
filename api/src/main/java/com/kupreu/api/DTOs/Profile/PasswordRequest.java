@@ -1,8 +1,17 @@
 package com.kupreu.api.DTOs.Profile;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class PasswordRequest {
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$",
+        message = "Password must contain at least one lowercase letter, one uppercase letter, one digit and one special character"
+    )
     public String password;
 }
