@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kupreu.api.DTOs.Category.CategoryRequest;
 import com.kupreu.api.DTOs.Category.CategoryResponse;
+import com.kupreu.api.DTOs.Category.CategoryWithSubcategoriesResponse;
 import com.kupreu.api.service.CategoryService;
 
 import jakarta.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,12 +31,12 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAll() {
+    public ResponseEntity<List<CategoryWithSubcategoriesResponse>> getAll() {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> getById(@PathVariable UUID id){
+    public ResponseEntity<CategoryWithSubcategoriesResponse> getById(@PathVariable UUID id){
         return ResponseEntity.ok(categoryService.getById(id));
     }
 

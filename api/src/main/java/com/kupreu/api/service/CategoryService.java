@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 
 import com.kupreu.api.DTOs.Category.CategoryRequest;
 import com.kupreu.api.DTOs.Category.CategoryResponse;
+import com.kupreu.api.DTOs.Category.CategoryWithSubcategoriesResponse;
+import com.kupreu.api.DTOs.Subcategory.SubcategoryResponse;
 import com.kupreu.api.entity.Category;
 import com.kupreu.api.repository.CategoryRepository;
+import com.kupreu.api.repository.SubcategoryRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,18 +20,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final SubcategoryRepository subcategoryRepository;
 
-    public List<CategoryResponse> getAll() {
+    public List<CategoryWithSubcategoriesResponse> getAll() {
         return categoryRepository.findAll()
                 .stream()
-                .map(this::toResponse)
+                .map(this::toResponseWithSubcategories)
                 .collect(Collectors.toList());
     }
 
-    public CategoryResponse getById(UUID id) {
+    public CategoryWithSubcategoriesResponse getById(UUID id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
-        return toResponse(category);
+        return toResponseWithSubcategories(category);
     }
 
     public CategoryResponse create(CategoryRequest request) {
@@ -56,6 +60,20 @@ public class CategoryService {
         }
 
         categoryRepository.deleteById(id);
+    }
+
+    private CategoryWithSubcategoriesResponse toResponseWithSubcategories(Category category) {
+        return CategoryWithSubcategoriesResponse.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .subcategories(subcategoryRepository.findByCategoryId(category.getId())
+                                        .stream()
+                                        .map(subcategory -> SubcategoryResponse.builder()
+                                                .id(subcategory.getId())
+                                                .name(subcategory.getName())
+                                                .build())
+                                        .collect(Collectors.toList()))
+                .build();
     }
 
     private CategoryResponse toResponse(Category category) {
