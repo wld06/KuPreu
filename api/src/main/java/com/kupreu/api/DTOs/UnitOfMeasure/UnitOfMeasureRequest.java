@@ -1,14 +1,9 @@
 package com.kupreu.api.DTOs.UnitOfMeasure;
 
-import lombok.Builder;
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
-@Builder
-public class UnitOfMeasureResponse {
-    public UUID id;
+public class UnitOfMeasureRequest {
     public String name;
     public String symbol;
 }
