@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.kupreu.api.DTOs.Category.CategoryRequest;
 import com.kupreu.api.DTOs.Category.CategoryResponse;
+import com.kupreu.api.DTOs.Category.CategoryWithSubcategoriesResponse;
 import com.kupreu.api.config.security.JwtAuthFilter;
 import com.kupreu.api.config.security.JwtProvider;
 import com.kupreu.api.config.security.RateLimitFilter;
@@ -66,6 +67,10 @@ class CategoryControllerTest {
         return CategoryResponse.builder().id(ID).name("Lácteos").build();
     }
 
+    private CategoryWithSubcategoriesResponse sampleWithSubcategories() {
+        return CategoryWithSubcategoriesResponse.builder().id(ID).name("Lácteos").subcategories(List.of()).build();
+    }
+
     // ── GET /api/categories ───────────────────────────────────────────────────
 
     @Test
@@ -81,8 +86,8 @@ class CategoryControllerTest {
     @Test
     void getAll_returnsList() throws Exception {
         when(categoryService.getAll()).thenReturn(List.of(
-                CategoryResponse.builder().id(ID).name("Lácteos").build(),
-                CategoryResponse.builder().id(UUID.randomUUID()).name("Bebidas").build()
+                CategoryWithSubcategoriesResponse.builder().id(ID).name("Lácteos").subcategories(List.of()).build(),
+                CategoryWithSubcategoriesResponse.builder().id(UUID.randomUUID()).name("Bebidas").subcategories(List.of()).build()
         ));
 
         mockMvc.perform(get("/api/categories"))
@@ -96,12 +101,13 @@ class CategoryControllerTest {
 
     @Test
     void getById_found_returns200() throws Exception {
-        when(categoryService.getById(ID)).thenReturn(sample());
+        when(categoryService.getById(ID)).thenReturn(sampleWithSubcategories());
 
         mockMvc.perform(get("/api/categories/{id}", ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(ID.toString()))
-                .andExpect(jsonPath("$.name").value("Lácteos"));
+                .andExpect(jsonPath("$.name").value("Lácteos"))
+                .andExpect(jsonPath("$.subcategories").isArray());
     }
 
     @Test

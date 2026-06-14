@@ -19,13 +19,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.kupreu.api.DTOs.Category.CategoryRequest;
 import com.kupreu.api.DTOs.Category.CategoryResponse;
+import com.kupreu.api.DTOs.Category.CategoryWithSubcategoriesResponse;
 import com.kupreu.api.entity.Category;
 import com.kupreu.api.repository.CategoryRepository;
+import com.kupreu.api.repository.SubcategoryRepository;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
 
     @Mock private CategoryRepository categoryRepository;
+    @Mock private SubcategoryRepository subcategoryRepository;
     @InjectMocks private CategoryService categoryService;
 
     private static final UUID ID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
@@ -47,10 +50,11 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getAll_mapsEntities() {
+    void getAll_mapsEntitiesWithSubcategories() {
         when(categoryRepository.findAll()).thenReturn(List.of(entity("Lácteos"), entity("Bebidas")));
+        when(subcategoryRepository.findByCategoryId(any(UUID.class))).thenReturn(List.of());
 
-        List<CategoryResponse> result = categoryService.getAll();
+        List<CategoryWithSubcategoriesResponse> result = categoryService.getAll();
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getName()).isEqualTo("Lácteos");
@@ -58,13 +62,15 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getById_found_returnsResponse() {
+    void getById_found_returnsResponseWithSubcategories() {
         when(categoryRepository.findById(ID)).thenReturn(Optional.of(entity("Lácteos")));
+        when(subcategoryRepository.findByCategoryId(ID)).thenReturn(List.of());
 
-        CategoryResponse res = categoryService.getById(ID);
+        CategoryWithSubcategoriesResponse res = categoryService.getById(ID);
 
         assertThat(res.getId()).isEqualTo(ID);
         assertThat(res.getName()).isEqualTo("Lácteos");
+        assertThat(res.getSubcategories()).isEmpty();
     }
 
     @Test
