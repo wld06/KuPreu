@@ -1,5 +1,7 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+
 import com.kupreu.api.DTOs.Store.StoreResponse;
 import com.kupreu.api.DTOs.SupermarketChain.SupermarketChainRequest;
 import com.kupreu.api.DTOs.SupermarketChain.SupermarketChainResponse;
@@ -28,7 +30,7 @@ public class SupermarketChainService {
 
     public SupermarketChainWithStoresResponse getById(UUID id){
         SupermarketChain smChain = supermarketChainRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Supermarket chain not found"));
+                .orElseThrow(() -> new NotFoundException("Supermarket chain not found"));
 
         return toResponseWithStore(smChain);
     }
@@ -45,7 +47,7 @@ public class SupermarketChainService {
 
     public SupermarketChainWithStoresResponse update(UUID id, SupermarketChainRequest request){
         SupermarketChain smChain = supermarketChainRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Supermarket chain not found"));
+                .orElseThrow(() -> new NotFoundException("Supermarket chain not found"));
 
         smChain.setName(request.getName());
         supermarketChainRepository.save(smChain);
@@ -55,7 +57,7 @@ public class SupermarketChainService {
 
     public void delete(UUID id){
         SupermarketChain smChain = supermarketChainRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Supermarket chain not found"));
+                .orElseThrow(() -> new NotFoundException("Supermarket chain not found"));
 
         supermarketChainRepository.delete(smChain);
     }

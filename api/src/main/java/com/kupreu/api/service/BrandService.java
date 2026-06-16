@@ -1,5 +1,8 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+import com.kupreu.api.exception.BadRequestException;
+
 import com.kupreu.api.DTOs.Brand.BrandRequest;
 import com.kupreu.api.DTOs.Brand.BrandResponse;
 import com.kupreu.api.entity.Brand;
@@ -36,17 +39,17 @@ public class BrandService {
 
     public BrandResponse getById(UUID id){
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Brand with id" + id + " not found"));
+                .orElseThrow(() -> new NotFoundException("Brand with id" + id + " not found"));
 
         return toResponse(brand);
     }
 
     public BrandResponse update(@NonNull UUID id, @NonNull BrandRequest request){
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Brand not found"));
+                .orElseThrow(() -> new NotFoundException("Brand not found"));
 
         if (request.getName() == null || request.getName().isBlank()){
-            throw new RuntimeException("Name is required");
+            throw new BadRequestException("Name is required");
         }
 
         brand.setName(request.getName());
@@ -58,14 +61,14 @@ public class BrandService {
 
     public void delete(UUID id){
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Brand not found"));
+                .orElseThrow(() -> new NotFoundException("Brand not found"));
 
         brandRepository.delete(brand);
     }
 
     public BrandResponse create(@NonNull BrandRequest request){
         if (request.getName() == null || request.getName().isBlank()){
-            throw new RuntimeException("Name is required");
+            throw new BadRequestException("Name is required");
         }
 
         Brand brand = Brand.builder()

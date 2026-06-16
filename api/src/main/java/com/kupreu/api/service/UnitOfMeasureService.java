@@ -1,5 +1,8 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+import com.kupreu.api.exception.BadRequestException;
+
 import com.kupreu.api.DTOs.UnitOfMeasure.UnitOfMeasureRequest;
 import com.kupreu.api.DTOs.UnitOfMeasure.UnitOfMeasureResponse;
 import com.kupreu.api.entity.UnitOfMeasure;
@@ -25,14 +28,14 @@ public class UnitOfMeasureService {
 
     public UnitOfMeasureResponse getById(UUID id){
         UnitOfMeasure unit = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Unit of measure not found"));
+                .orElseThrow(() -> new NotFoundException("Unit of measure not found"));
 
         return toResponse(unit);
     }
 
     public UnitOfMeasureResponse update(UUID id, UnitOfMeasureRequest request){
         UnitOfMeasure unit = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Unit of measure not found"));
+                .orElseThrow(() -> new NotFoundException("Unit of measure not found"));
 
         if (request.getName() != null || !request.getName().isBlank()){
             unit.setName(request.getName());
@@ -49,11 +52,11 @@ public class UnitOfMeasureService {
 
     public UnitOfMeasureResponse create(UnitOfMeasureRequest request){
         if (request.getName() == null || request.getName().isBlank()){
-            throw new RuntimeException("A name is required");
+            throw new BadRequestException("A name is required");
         }
 
         if (request.getSymbol() == null || request.getSymbol().isBlank()){
-            throw new RuntimeException("A symbol is required");
+            throw new BadRequestException("A symbol is required");
         }
 
         UnitOfMeasure unit = UnitOfMeasure.builder()
@@ -68,7 +71,7 @@ public class UnitOfMeasureService {
 
     public void delete(UUID id){
         UnitOfMeasure unit = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Unit of measure not found"));
+                .orElseThrow(() -> new NotFoundException("Unit of measure not found"));
 
         repository.delete(unit);
     }

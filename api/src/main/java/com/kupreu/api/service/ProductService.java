@@ -1,5 +1,8 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+import com.kupreu.api.exception.ConflictException;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,25 +42,25 @@ public class ProductService {
 
     public void delete(UUID id) {
         if (!productRepository.existsById(id)){
-            throw new RuntimeException("Product not found");
+            throw new NotFoundException("Product not found");
         }
         productRepository.deleteById(id);
     }
 
     public ProductResponse update(UUID id, ProductRequest request) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
 
         if (!product.getName().equals(request.name) && productRepository.existsByName(request.name)){
-            throw new RuntimeException("Product with the same name already exists");
+            throw new ConflictException("Product with the same name already exists");
         }
 
         Subcategory subcategory = subcategoryRepository.findById(request.subcategoryId)
-            .orElseThrow(() -> new RuntimeException("Subcategory not found"));
+            .orElseThrow(() -> new NotFoundException("Subcategory not found"));
        Brand brand = brandRepository.findById(request.brandId)
-            .orElseThrow(() -> new RuntimeException("Brand not found"));
+            .orElseThrow(() -> new NotFoundException("Brand not found"));
        UnitOfMeasure unitOfMeasure = unitOfMeasureRepository.findById(request.unitOfMeasureId)
-            .orElseThrow(() -> new RuntimeException("Unit of Measure not found"));
+            .orElseThrow(() -> new NotFoundException("Unit of Measure not found"));
         
         product.setName(request.name);
         product.setEan(request.ean);
@@ -71,15 +74,15 @@ public class ProductService {
 
     public ProductResponse create(ProductRequest request){
        if (productRepository.existsByName(request.name)){
-            throw new RuntimeException("Product with the same name already exists");
+            throw new ConflictException("Product with the same name already exists");
        }
 
        Subcategory subcategory = subcategoryRepository.findById(request.subcategoryId)
-            .orElseThrow(() -> new RuntimeException("Subcategory not found"));
+            .orElseThrow(() -> new NotFoundException("Subcategory not found"));
        Brand brand = brandRepository.findById(request.brandId)
-            .orElseThrow(() -> new RuntimeException("Brand not found"));
+            .orElseThrow(() -> new NotFoundException("Brand not found"));
        UnitOfMeasure unitOfMeasure = unitOfMeasureRepository.findById(request.unitOfMeasureId)
-            .orElseThrow(() -> new RuntimeException("Unit of Measure not found"));
+            .orElseThrow(() -> new NotFoundException("Unit of Measure not found"));
 
        Product product = Product.builder()
             .name(request.name)
@@ -102,13 +105,13 @@ public class ProductService {
 
     public ProductResponse getProductById(UUID id){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
         return toResponse(product);
     }
 
     public ProductResponse getByEan(String ean){
         Product product = productRepository.findByEan(ean)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new NotFoundException("Product not found"));
         return toResponse(product);
     }
 

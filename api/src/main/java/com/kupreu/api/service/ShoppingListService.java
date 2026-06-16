@@ -1,5 +1,8 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+import com.kupreu.api.exception.ConflictException;
+
 import com.kupreu.api.DTOs.DateDIMDTO;
 import com.kupreu.api.DTOs.PriceSnapshot.PriceSnapshotResponse;
 import com.kupreu.api.DTOs.ShoppingList.*;
@@ -27,7 +30,7 @@ public class ShoppingListService {
 
     public List<ShoppingListResponse> getAll(String username){
         User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         return repository.findByUser(user.getId())
                 .stream()
@@ -43,11 +46,11 @@ public class ShoppingListService {
 
     public ShoppingListResponse create(ShoppingListRequest request, String username){
         if (repository.existsByName(request.getName())){
-            throw new RuntimeException("A shopping list with the same name exists");
+            throw new ConflictException("A shopping list with the same name exists");
         }
 
         User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         ShoppingList sl = ShoppingList.builder()
                 .name(request.getName())
@@ -129,7 +132,7 @@ public class ShoppingListService {
         ShoppingList sl = getShoppingListIfAuthenticated(shoppingListId, username);
 
         ShoppingListItem item = sliRepository.findById(shoppingListItemId)
-                .orElseThrow(() -> new RuntimeException("A shopping list item id is required"));
+                .orElseThrow(() -> new NotFoundException("A shopping list item id is required"));
 
         item.setQuantity(request.getQuantity());
 
@@ -142,7 +145,7 @@ public class ShoppingListService {
         ShoppingList sl = getShoppingListIfAuthenticated(shoppingListId, username);
 
         ShoppingListItem item = sliRepository.findById(shoppingListItemId)
-                .orElseThrow(() -> new RuntimeException("A shopping list item id is required"));
+                .orElseThrow(() -> new NotFoundException("A shopping list item id is required"));
 
         sliRepository.delete(item);
 
@@ -153,13 +156,13 @@ public class ShoppingListService {
 
     private ShoppingList getShoppingListIfAuthenticated(UUID slId, String username){
         ShoppingList sl = repository.findById(slId)
-                .orElseThrow(() -> new RuntimeException("Shopping list not found"));
+                .orElseThrow(() -> new NotFoundException("Shopping list not found"));
 
         User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!sl.getUser().getId().equals(user.getId())){
-            throw new RuntimeException("Shopping list not found");
+            throw new NotFoundException("Shopping list not found");
         }
 
         //if the user is the owner of the Shopping list, it will return it, if not error

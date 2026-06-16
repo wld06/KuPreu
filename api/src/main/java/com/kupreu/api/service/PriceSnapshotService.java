@@ -1,5 +1,7 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -35,7 +37,7 @@ public class PriceSnapshotService {
     public List<PriceSnapshotResponse> getPriceSnapshotByProductId(UUID productId){
         List<PriceSnapshot> priceSnapshots = priceSnapshotRepository.findByProductId(productId);
         if (priceSnapshots == null || priceSnapshots.isEmpty()) {
-            throw new RuntimeException("Price snapshot not found for product id: " + productId);
+            throw new NotFoundException("Price snapshot not found for product id: " + productId);
         }
 
         return priceSnapshots.stream()
@@ -47,7 +49,7 @@ public class PriceSnapshotService {
     public List<PriceSnapshotResponse> getPriceSnapshotsByProductIdAndStoreId(UUID productId, UUID storeId){
         List<PriceSnapshot> priceSnapshots = priceSnapshotRepository.findByProductIdAndStoreId(productId, storeId);
         if (priceSnapshots == null || priceSnapshots.isEmpty()) {
-            throw new RuntimeException("Price snapshot not found for product id: " + productId + " and store id: " + storeId);
+            throw new NotFoundException("Price snapshot not found for product id: " + productId + " and store id: " + storeId);
         }
 
         return priceSnapshots.stream()
@@ -58,7 +60,7 @@ public class PriceSnapshotService {
 
     public PriceSnapshotResponse updateEndDate(LocalDateTime dateEnd, PriceSnapshotId id){
         PriceSnapshot priceSnapshot = priceSnapshotRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Price snapshot not found with id: " + id));
+            .orElseThrow(() -> new NotFoundException("Price snapshot not found with id: " + id));
         
         DateDIM dateEndDim = dateDIMRepository.findByDate(dateEnd)
             .orElseGet(() -> dateDIMRepository.save(DateDIM.builder().date(dateEnd).build()));
@@ -69,10 +71,10 @@ public class PriceSnapshotService {
 
     public PriceSnapshotResponse create(PriceSnapshotRequest request){
         Product product = productRepository.findById(request.getProductId())
-            .orElseThrow(() -> new RuntimeException("Product not found with id: " + request.getProductId()));
+            .orElseThrow(() -> new NotFoundException("Product not found with id: " + request.getProductId()));
         
         Store store = storeRepository.findById(request.getStoreId())
-            .orElseThrow(() -> new RuntimeException("Store not found with id: " + request.getStoreId()));
+            .orElseThrow(() -> new NotFoundException("Store not found with id: " + request.getStoreId()));
         
         DateDIM dateStart = dateDIMRepository.findByDate(request.getDateStart())
             .orElseGet(() -> dateDIMRepository.save(DateDIM.builder().date(request.getDateStart()).build()));
@@ -102,14 +104,14 @@ public class PriceSnapshotService {
     public PriceSnapshotResponse getCheapest(UUID productId){
         List<PriceSnapshot> priceSnapshots = priceSnapshotRepository.findByProductId(productId);
         if (priceSnapshots == null || priceSnapshots.isEmpty()) {
-            throw new RuntimeException("Price snapshot not found for product id: " + productId);
+            throw new NotFoundException("Price snapshot not found for product id: " + productId);
         }
 
         return priceSnapshots.stream()
             .filter(ps -> ps.getDateEnd() == null)
             .min(Comparator.comparing(PriceSnapshot::getPrice))
             .map(this::toResponse)
-            .orElseThrow(() -> new RuntimeException("No active price snapshots with product id: " + productId));
+            .orElseThrow(() -> new NotFoundException("No active price snapshots with product id: " + productId));
     }
 
     private PriceSnapshotResponse toResponse(PriceSnapshot priceSnapshot){

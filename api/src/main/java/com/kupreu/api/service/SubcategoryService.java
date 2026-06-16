@@ -1,5 +1,8 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+import com.kupreu.api.exception.BadRequestException;
+
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -23,22 +26,22 @@ public class SubcategoryService {
 
     public SubcategoryWithCategory getById(UUID id){
         Subcategory sub =  subcategoryRepository.findById(id)
-                            .orElseThrow(() -> new RuntimeException("Subcategory with id " + id + " does not exist"));
+                            .orElseThrow(() -> new NotFoundException("Subcategory with id " + id + " does not exist"));
         return toResponseWithCategory(sub);
     }
 
     public void delete(UUID id){
         Subcategory subcategory = subcategoryRepository.findById(id)
-                                    .orElseThrow(() -> new RuntimeException("Subcategory with id " + id + " does not exist"));
+                                    .orElseThrow(() -> new NotFoundException("Subcategory with id " + id + " does not exist"));
         subcategoryRepository.delete(subcategory);
     }
 
     public SubcategoryWithCategory update(UUID id, SubcategoryRequest request){
         Subcategory subcategory = subcategoryRepository.findById(id)
-                                    .orElseThrow(() -> new RuntimeException("Subcategory not found"));
+                                    .orElseThrow(() -> new NotFoundException("Subcategory not found"));
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                                .orElseThrow(() -> new RuntimeException("Category not found"));
+                                .orElseThrow(() -> new NotFoundException("Category not found"));
 
         subcategory.setName(request.getName());
         subcategory.setCategory(category);
@@ -50,14 +53,14 @@ public class SubcategoryService {
 
     public SubcategoryWithCategory create(SubcategoryRequest request){
         if (request.getCategoryId() == null){
-            throw new RuntimeException("A category id is required");
+            throw new BadRequestException("A category id is required");
         }
         if (request.getName() == null){
-            throw new RuntimeException("A name is required");
+            throw new BadRequestException("A name is required");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category with id " + request.getCategoryId() + " does not exist"));
+                .orElseThrow(() -> new NotFoundException("Category with id " + request.getCategoryId() + " does not exist"));
 
         Subcategory subcategory = subcategoryRepository.save(
             Subcategory.builder()
@@ -71,7 +74,7 @@ public class SubcategoryService {
 
     private SubcategoryWithCategory toResponseWithCategory(Subcategory subcategory){
         Category category = categoryRepository.findById(subcategory.getCategory().getId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new NotFoundException("Category not found"));
         return SubcategoryWithCategory.builder()
                 .id(subcategory.getId())
                 .name(subcategory.getName())

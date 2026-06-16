@@ -1,5 +1,8 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+import com.kupreu.api.exception.ConflictException;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,13 +34,13 @@ public class CategoryService {
 
     public CategoryWithSubcategoriesResponse getById(UUID id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Category not found with id: " + id));
         return toResponseWithSubcategories(category);
     }
 
     public CategoryResponse create(CategoryRequest request) {
         if (categoryRepository.existsByName(request.getName())){
-            throw new RuntimeException("Category already exists with name: " + request.getName());
+            throw new ConflictException("Category already exists with name: " + request.getName());
         }
 
         Category category = Category.builder()
@@ -49,14 +52,14 @@ public class CategoryService {
 
     public CategoryResponse update(UUID id, CategoryRequest request){
         Category category = categoryRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Category not found"));
+                                .orElseThrow(() -> new NotFoundException("Category not found"));
         category.setName(request.getName());
         return toResponse(categoryRepository.save(category));
     }
 
     public void delete(UUID id){
         if (!categoryRepository.existsById(id)){
-            throw new RuntimeException("Category not found");
+            throw new NotFoundException("Category not found");
         }
 
         categoryRepository.deleteById(id);

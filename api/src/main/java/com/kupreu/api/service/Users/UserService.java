@@ -1,5 +1,7 @@
 package com.kupreu.api.service.Users;
 
+import com.kupreu.api.exception.NotFoundException;
+
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -31,7 +33,7 @@ public class UserService {
     }
 
     public AdminResponse updateUserRole(UUID id, boolean isAdmin){
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
         user.setAdmin(isAdmin);
         userRepository.save(user);
         return AdminResponse.builder()

@@ -1,5 +1,8 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+import com.kupreu.api.exception.BadRequestException;
+
 import com.kupreu.api.DTOs.Store.StoreRequest;
 import com.kupreu.api.DTOs.Store.StoreResponse;
 import com.kupreu.api.entity.PostalCode;
@@ -31,20 +34,20 @@ public class StoreService {
 
     public StoreResponse getById(UUID id){
         Store store = storeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Store not found"));
+                .orElseThrow(() -> new NotFoundException("Store not found"));
 
         return toResponse(store);
     }
 
     public StoreResponse create(StoreRequest request){
         SupermarketChain smChain = smChainRepository.findById(request.getSupermarketChainId())
-                .orElseThrow(() -> new RuntimeException("A supermarket cchain is required"));
+                .orElseThrow(() -> new NotFoundException("A supermarket cchain is required"));
 
         PostalCode postalCode = postalCodeRepository.findByCode(request.postalCode)
-                .orElseThrow(() -> new RuntimeException("A postal code is required"));
+                .orElseThrow(() -> new NotFoundException("A postal code is required"));
 
         if (request.address == null || request.address.isBlank()){
-            throw new RuntimeException("An address is required");
+            throw new BadRequestException("An address is required");
         }
 
         Store store = Store.builder()
@@ -61,24 +64,24 @@ public class StoreService {
     public StoreResponse update(UUID id, StoreRequest request){
 
         Store store = storeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Store not found"));
+                .orElseThrow(() -> new NotFoundException("Store not found"));
 
         if (request.getSupermarketChainId() != null){
             SupermarketChain smChain = smChainRepository.findById(request.getSupermarketChainId())
-                    .orElseThrow(() -> new RuntimeException("A supermarket cchain is required"));
+                    .orElseThrow(() -> new NotFoundException("A supermarket cchain is required"));
 
             store.setSupermarketChain(smChain);
         }
 
         if (request.getPostalCode() != null && !request.getPostalCode().isBlank()){
             PostalCode postalCode = postalCodeRepository.findByCode(request.postalCode)
-                    .orElseThrow(() -> new RuntimeException("A postal code is required"));
+                    .orElseThrow(() -> new NotFoundException("A postal code is required"));
 
             store.setPostalCode(postalCode);
         }
 
         if (request.address == null || request.address.isBlank()){
-            throw new RuntimeException("An address is required");
+            throw new BadRequestException("An address is required");
         }
 
         store.setAddress(request.getAddress());
@@ -89,7 +92,7 @@ public class StoreService {
 
     public void delete(UUID id){
         Store store = storeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Store not found"));
+                .orElseThrow(() -> new NotFoundException("Store not found"));
 
         storeRepository.delete(store);
     }

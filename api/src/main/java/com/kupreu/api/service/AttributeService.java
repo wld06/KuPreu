@@ -1,5 +1,8 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.exception.NotFoundException;
+import com.kupreu.api.exception.BadRequestException;
+
 import com.kupreu.api.DTOs.Attribute.AttributeRequest;
 import com.kupreu.api.DTOs.Attribute.AttributeResponse;
 import com.kupreu.api.entity.Attribute;
@@ -25,14 +28,14 @@ public class AttributeService {
 
     public AttributeResponse getById(UUID id){
         Attribute att = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Attribute not found"));
+                .orElseThrow(() -> new NotFoundException("Attribute not found"));
 
         return toResponse(att);
     }
 
     public AttributeResponse create(AttributeRequest request){
         if (request.getName() == null || request.getName().isBlank()){
-            throw new RuntimeException("A name is required");
+            throw new BadRequestException("A name is required");
         }
 
         Attribute att = Attribute.builder()
@@ -46,10 +49,10 @@ public class AttributeService {
 
     public AttributeResponse update (UUID id, AttributeRequest request){
         Attribute att = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Attribute not found"));
+                .orElseThrow(() -> new NotFoundException("Attribute not found"));
 
         if (request.getName() == null || request.getName().isBlank()){
-            throw new RuntimeException("A name is required");
+            throw new BadRequestException("A name is required");
         }
 
         att.setName(request.getName());
@@ -60,7 +63,7 @@ public class AttributeService {
 
     public void delete(UUID id){
         Attribute att = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Attribute not found"));
+                .orElseThrow(() -> new NotFoundException("Attribute not found"));
 
         repository.delete(att);
     }

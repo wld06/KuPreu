@@ -1,5 +1,7 @@
 package com.kupreu.api.service.Users;
 
+import com.kupreu.api.exception.NotFoundException;
+
 import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +24,7 @@ public class ProfileService {
 
     public ProfileResponse getMyProfile(String username) {
         User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         return ProfileResponse.builder()
                 .id(user.getId())
@@ -40,7 +42,7 @@ public class ProfileService {
 
     public ProfileResponse getProfileById(UUID id) {
         User user = userRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new NotFoundException("User not found"));
         
         return ProfileResponse.builder()
                 .id(id)
@@ -59,7 +61,7 @@ public class ProfileService {
 
     public ProfileResponse getProfileByEmail(String email){
         User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new NotFoundException("User not found"));
         
         return ProfileResponse.builder()
                 .id(user.getId())
@@ -78,7 +80,7 @@ public class ProfileService {
 
     public void updatePassword(UserDetails userDetails, PasswordRequest request){
         User user = userRepository.findByEmail(userDetails.getUsername())
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+                        .orElseThrow(() -> new NotFoundException("User not found"));
         
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
