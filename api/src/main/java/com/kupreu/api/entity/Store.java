@@ -12,12 +12,18 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "store")
-@Data
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,6 +31,7 @@ public class Store {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @Column(nullable = false)
@@ -32,9 +39,11 @@ public class Store {
 
     @ManyToOne
     @JoinColumn(name = "id_chain", nullable = false)
+    @ToString.Exclude
     private SupermarketChain supermarketChain;
 
     @ManyToOne
     @JoinColumn(name = "id_postal_code")
+    @ToString.Exclude
     private PostalCode postalCode;
 }

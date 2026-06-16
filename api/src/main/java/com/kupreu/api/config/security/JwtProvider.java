@@ -1,5 +1,6 @@
 package com.kupreu.api.config.security;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -21,7 +22,7 @@ public class JwtProvider {
     private Long expiration;
 
     private SecretKey getSigningKey(){
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String email){

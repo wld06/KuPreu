@@ -12,12 +12,18 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "postal_code")
-@Data
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,6 +31,7 @@ public class PostalCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -34,8 +41,10 @@ public class PostalCode {
     private String city;
 
     @OneToMany(mappedBy = "postalCode")
+    @ToString.Exclude
     private List<Store> stores;
 
     @OneToMany(mappedBy = "postalCode")
+    @ToString.Exclude
     private List<User> users;
 }

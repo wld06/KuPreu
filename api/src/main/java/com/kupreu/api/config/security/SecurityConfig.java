@@ -51,7 +51,7 @@ public class SecurityConfig {
                 .frameOptions(frame -> frame.deny())
                 .httpStrictTransportSecurity(hsts -> hsts
                     .includeSubDomains(true)
-                    .maxAgeInSeconds(31546000))
+                    .maxAgeInSeconds(31536000))
                 .contentTypeOptions(Customizer.withDefaults())
                 .referrerPolicy(referrer -> referrer
                     .policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
