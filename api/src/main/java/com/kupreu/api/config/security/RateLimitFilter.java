@@ -50,6 +50,8 @@ public class RateLimitFilter extends OncePerRequestFilter{
             return;
         }
 
+        // Real client IP: server.forward-headers-strategy=framework makes Spring
+        // rewrite getRemoteAddr() from X-Forwarded-For/Forwarded when behind a proxy.
         String ip = request.getRemoteAddr();
 
         byte[] key = ("rate_limit:" + ip).getBytes(StandardCharsets.UTF_8);
