@@ -64,7 +64,7 @@ class PriceSnapshotControllerTest {
 
     private PriceSnapshotResponse sample() {
         return PriceSnapshotResponse.builder()
-                .id(PRODUCT_ID)
+                .uuid(PRODUCT_ID)
                 .store(StoreResponse.builder().id(STORE_ID).address("Calle A").chain("Mercadona").build())
                 .price(new BigDecimal("1.50"))
                 .dateStart(DateDIMDTO.builder().id(UUID.randomUUID()).date(LocalDateTime.of(2026, 1, 1, 0, 0)).build())

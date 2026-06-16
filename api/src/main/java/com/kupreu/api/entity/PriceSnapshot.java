@@ -1,14 +1,9 @@
 package com.kupreu.api.entity;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +19,16 @@ public class PriceSnapshot {
 
     @EmbeddedId
     private PriceSnapshotId id;
+
+    @Column(name = "uuid", nullable = false, unique = true, updatable = false)
+    private UUID uuid;
+
+    @PrePersist
+    private void assignUuid(){
+        if (uuid == null){
+            uuid = UUID.randomUUID();
+        }
+    }
 
     @ManyToOne
     @MapsId("productId")
@@ -42,7 +47,7 @@ public class PriceSnapshot {
 
     @ManyToOne
     @MapsId("dateEndId")
-    @JoinColumn(name = "id_date_end", nullable = false)
+    @JoinColumn(name = "id_date_end", nullable = true)
     private DateDIM dateEnd;
 
     @Column(nullable = false, precision = 10, scale = 2)

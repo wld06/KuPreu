@@ -238,9 +238,7 @@ class PriceSnapshotServiceTest {
 
     @Test
     void getCheapest_allHaveEndDate_throwsNoActive() {
-        // NOTE: getCheapest only considers snapshots with dateEnd == null as "active".
-        // The PriceSnapshot.dateEnd column is non-nullable, so in practice no snapshot
-        // is ever active and this always throws. See implementation findings.
+        // Active = dateEnd == null. Every snapshot here has a dateEnd (inactive) → throws.
         LocalDateTime when = LocalDateTime.of(2026, 1, 1, 0, 0);
         when(priceSnapshotRepository.findByProductId(PRODUCT_ID)).thenReturn(List.of(
                 snapshot(new BigDecimal("1.00"), when, date(when))
@@ -249,5 +247,20 @@ class PriceSnapshotServiceTest {
         assertThatThrownBy(() -> priceSnapshotService.getCheapest(PRODUCT_ID))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("No active price snapshots");
+    }
+
+    @Test
+    void getCheapest_returnsCheapestActive_ignoresInactive() {
+        LocalDateTime when = LocalDateTime.of(2026, 1, 1, 0, 0);
+        when(priceSnapshotRepository.findByProductId(PRODUCT_ID)).thenReturn(List.of(
+                snapshot(new BigDecimal("2.00"), when, null),        // active
+                snapshot(new BigDecimal("1.00"), when, null),        // active, cheapest
+                snapshot(new BigDecimal("0.50"), when, date(when))   // inactive (has dateEnd), ignored
+        ));
+
+        PriceSnapshotResponse res = priceSnapshotService.getCheapest(PRODUCT_ID);
+
+        assertThat(res.getPrice()).isEqualByComparingTo("1.00");
+        assertThat(res.getDateEnd()).isNull();
     }
 }

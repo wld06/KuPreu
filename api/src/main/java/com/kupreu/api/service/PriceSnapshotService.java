@@ -114,7 +114,7 @@ public class PriceSnapshotService {
 
     private PriceSnapshotResponse toResponse(PriceSnapshot priceSnapshot){
         return PriceSnapshotResponse.builder()
-            .id(priceSnapshot.getId().getProductId())
+            .uuid(priceSnapshot.getUuid())
             .store(
                 StoreResponse.builder()
                     .id(priceSnapshot.getStore().getId())
@@ -130,10 +130,11 @@ public class PriceSnapshotService {
                     .build()
             )
             .dateEnd(
-                DateDIMDTO.builder()
-                    .id(priceSnapshot.getDateEnd().getId())
-                    .date(priceSnapshot.getDateEnd().getDate())
-                    .build()
+                priceSnapshot.getDateEnd() == null ? null :
+                        DateDIMDTO.builder()
+                            .id(priceSnapshot.getDateEnd().getId())
+                            .date(priceSnapshot.getDateEnd().getDate())
+                            .build()
             )
             .build();
     }

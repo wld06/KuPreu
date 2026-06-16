@@ -35,6 +35,6 @@ public class ShoppingListItem {
     private ShoppingList shoppingList;
 
     @ManyToOne
-    @JoinColumn(name = "id_product", nullable = false)
-    private Product product;
+    @JoinColumn(name = "price_snapshot_id", referencedColumnName = "uuid", nullable = false)
+    private PriceSnapshot priceSnapshot;
 }

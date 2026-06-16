@@ -13,4 +13,5 @@ import com.kupreu.api.entity.PriceSnapshotId;
 public interface PriceSnapshotRepository extends JpaRepository<PriceSnapshot, PriceSnapshotId> {
     List<PriceSnapshot> findByProductId(UUID productId);
     List<PriceSnapshot> findByProductIdAndStoreId(UUID productId, UUID storeId);
+    PriceSnapshot findByUuid(UUID uuid);
 }
