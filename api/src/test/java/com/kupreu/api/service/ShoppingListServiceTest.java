@@ -218,10 +218,9 @@ class ShoppingListServiceTest {
         PriceSnapshot current = priceSnapshot(PS_UUID, new BigDecimal("2.00"), null);
         when(repository.findById(LIST_ID)).thenReturn(Optional.of(list(u, item(ITEM_ID, 1, current))));
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(u));
-        when(psRepository.findByProductId(PRODUCT_ID)).thenReturn(List.of(
-                priceSnapshot(UUID.randomUUID(), new BigDecimal("1.00"), null),                                   // active cheapest
-                priceSnapshot(UUID.randomUUID(), new BigDecimal("0.50"), DateDIM.builder().id(UUID.randomUUID()).date(LocalDateTime.now()).build()) // inactive, ignored
-        ));
+        // DB returns the cheapest active snapshot directly (filtering/ordering pushed down)
+        when(psRepository.findFirstByProductIdAndDateEndIsNullOrderByPriceAsc(PRODUCT_ID))
+                .thenReturn(Optional.of(priceSnapshot(UUID.randomUUID(), new BigDecimal("1.00"), null)));
 
         ShoppingListResponse res = service.getCheapestList(LIST_ID, EMAIL);
 

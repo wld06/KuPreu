@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -199,10 +198,7 @@ public class ShoppingListService {
     }
 
     private PriceSnapshotResponse findCheapest(UUID productId){
-        return psRepository.findByProductId(productId)
-                .stream()
-                .filter(ps -> ps.getDateEnd() == null)
-                .min(Comparator.comparing(PriceSnapshot::getPrice))
+        return psRepository.findFirstByProductIdAndDateEndIsNullOrderByPriceAsc(productId)
                 .map(this::toPriceSnapshotResponse)
                 .orElse(null);
     }

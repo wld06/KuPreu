@@ -1,6 +1,7 @@
 package com.kupreu.api.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,5 @@ public interface PriceSnapshotRepository extends JpaRepository<PriceSnapshot, Pr
     List<PriceSnapshot> findByProductId(UUID productId);
     List<PriceSnapshot> findByProductIdAndStoreId(UUID productId, UUID storeId);
     PriceSnapshot findByUuid(UUID uuid);
+    Optional<PriceSnapshot> findFirstByProductIdAndDateEndIsNullOrderByPriceAsc(UUID productId);
 }
