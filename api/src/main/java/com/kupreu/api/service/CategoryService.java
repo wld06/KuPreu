@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kupreu.api.DTOs.Category.CategoryRequest;
 import com.kupreu.api.DTOs.Category.CategoryResponse;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final SubcategoryRepository subcategoryRepository;
@@ -38,6 +40,7 @@ public class CategoryService {
         return toResponseWithSubcategories(category);
     }
 
+    @Transactional
     public CategoryResponse create(CategoryRequest request) {
         if (categoryRepository.existsByName(request.getName())){
             throw new ConflictException("Category already exists with name: " + request.getName());
@@ -50,6 +53,7 @@ public class CategoryService {
         return toResponse(categoryRepository.save(category));
     }
 
+    @Transactional
     public CategoryResponse update(UUID id, CategoryRequest request){
         Category category = categoryRepository.findById(id)
                                 .orElseThrow(() -> new NotFoundException("Category not found"));
@@ -57,6 +61,7 @@ public class CategoryService {
         return toResponse(categoryRepository.save(category));
     }
 
+    @Transactional
     public void delete(UUID id){
         if (!categoryRepository.existsById(id)){
             throw new NotFoundException("Category not found");

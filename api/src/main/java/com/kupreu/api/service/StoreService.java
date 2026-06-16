@@ -13,6 +13,7 @@ import com.kupreu.api.repository.StoreRepository;
 import com.kupreu.api.repository.SupermarketChainRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class StoreService {
     private final StoreRepository storeRepository;
     private final SupermarketChainRepository smChainRepository;
@@ -39,6 +41,7 @@ public class StoreService {
         return toResponse(store);
     }
 
+    @Transactional
     public StoreResponse create(StoreRequest request){
         SupermarketChain smChain = smChainRepository.findById(request.getSupermarketChainId())
                 .orElseThrow(() -> new NotFoundException("A supermarket cchain is required"));
@@ -61,6 +64,7 @@ public class StoreService {
         return getById(store.getId());
     }
 
+    @Transactional
     public StoreResponse update(UUID id, StoreRequest request){
 
         Store store = storeRepository.findById(id)
@@ -90,6 +94,7 @@ public class StoreService {
         return getById(store.getId());
     }
 
+    @Transactional
     public void delete(UUID id){
         Store store = storeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Store not found"));

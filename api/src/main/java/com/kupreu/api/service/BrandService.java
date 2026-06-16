@@ -8,6 +8,7 @@ import com.kupreu.api.DTOs.Brand.BrandResponse;
 import com.kupreu.api.entity.Brand;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kupreu.api.repository.BrandRepository;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class BrandService {
     private final BrandRepository brandRepository;
 
@@ -44,6 +46,7 @@ public class BrandService {
         return toResponse(brand);
     }
 
+    @Transactional
     public BrandResponse update(@NonNull UUID id, @NonNull BrandRequest request){
         Brand brand = brandRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Brand not found"));
@@ -59,6 +62,7 @@ public class BrandService {
         return getById(brand.getId());
     }
 
+    @Transactional
     public void delete(UUID id){
         Brand brand = brandRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Brand not found"));
@@ -66,6 +70,7 @@ public class BrandService {
         brandRepository.delete(brand);
     }
 
+    @Transactional
     public BrandResponse create(@NonNull BrandRequest request){
         if (request.getName() == null || request.getName().isBlank()){
             throw new BadRequestException("Name is required");

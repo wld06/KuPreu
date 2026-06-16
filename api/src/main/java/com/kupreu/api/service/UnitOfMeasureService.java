@@ -9,6 +9,7 @@ import com.kupreu.api.entity.UnitOfMeasure;
 import com.kupreu.api.repository.UnitOfMeasureRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class UnitOfMeasureService {
     private final UnitOfMeasureRepository repository;
 
@@ -33,6 +35,7 @@ public class UnitOfMeasureService {
         return toResponse(unit);
     }
 
+    @Transactional
     public UnitOfMeasureResponse update(UUID id, UnitOfMeasureRequest request){
         UnitOfMeasure unit = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Unit of measure not found"));
@@ -50,6 +53,7 @@ public class UnitOfMeasureService {
         return getById(unit.getId());
     }
 
+    @Transactional
     public UnitOfMeasureResponse create(UnitOfMeasureRequest request){
         if (request.getName() == null || request.getName().isBlank()){
             throw new BadRequestException("A name is required");
@@ -69,6 +73,7 @@ public class UnitOfMeasureService {
         return getById(unit.getId());
     }
 
+    @Transactional
     public void delete(UUID id){
         UnitOfMeasure unit = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Unit of measure not found"));

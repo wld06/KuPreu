@@ -9,6 +9,7 @@ import com.kupreu.api.entity.Attribute;
 import com.kupreu.api.repository.AttributeRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class AttributeService {
     private final AttributeRepository repository;
 
@@ -33,6 +35,7 @@ public class AttributeService {
         return toResponse(att);
     }
 
+    @Transactional
     public AttributeResponse create(AttributeRequest request){
         if (request.getName() == null || request.getName().isBlank()){
             throw new BadRequestException("A name is required");
@@ -47,6 +50,7 @@ public class AttributeService {
         return toResponse(att);
     }
 
+    @Transactional
     public AttributeResponse update (UUID id, AttributeRequest request){
         Attribute att = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Attribute not found"));
@@ -61,6 +65,7 @@ public class AttributeService {
         return toResponse(att);
     }
 
+    @Transactional
     public void delete(UUID id){
         Attribute att = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Attribute not found"));

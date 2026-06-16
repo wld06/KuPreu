@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kupreu.api.DTOs.Product.ProductRequest;
 import com.kupreu.api.DTOs.Product.ProductResponse;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductService {
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
@@ -40,6 +42,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void delete(UUID id) {
         if (!productRepository.existsById(id)){
             throw new NotFoundException("Product not found");
@@ -47,6 +50,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+    @Transactional
     public ProductResponse update(UUID id, ProductRequest request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
@@ -72,6 +76,7 @@ public class ProductService {
         return toResponse(productRepository.save(product));
     }
 
+    @Transactional
     public ProductResponse create(ProductRequest request){
        if (productRepository.existsByName(request.name)){
             throw new ConflictException("Product with the same name already exists");

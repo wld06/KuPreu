@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kupreu.api.DTOs.PostalCodeDTO;
 import com.kupreu.api.DTOs.Profile.PasswordRequest;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProfileService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -78,6 +80,7 @@ public class ProfileService {
                 .build();
     }
 
+    @Transactional
     public void updatePassword(UserDetails userDetails, PasswordRequest request){
         User user = userRepository.findByEmail(userDetails.getUsername())
                         .orElseThrow(() -> new NotFoundException("User not found"));

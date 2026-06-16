@@ -11,6 +11,7 @@ import com.kupreu.api.entity.SupermarketChain;
 import com.kupreu.api.repository.SupermarketChainRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class SupermarketChainService {
     private final SupermarketChainRepository supermarketChainRepository;
 
@@ -35,6 +37,7 @@ public class SupermarketChainService {
         return toResponseWithStore(smChain);
     }
 
+    @Transactional
     public SupermarketChainWithStoresResponse create(SupermarketChainRequest request){
         SupermarketChain smChain = SupermarketChain.builder()
                 .name(request.getName())
@@ -45,6 +48,7 @@ public class SupermarketChainService {
         return getById(smChain.getId());
     }
 
+    @Transactional
     public SupermarketChainWithStoresResponse update(UUID id, SupermarketChainRequest request){
         SupermarketChain smChain = supermarketChainRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Supermarket chain not found"));
@@ -55,6 +59,7 @@ public class SupermarketChainService {
         return getById(smChain.getId());
     }
 
+    @Transactional
     public void delete(UUID id){
         SupermarketChain smChain = supermarketChainRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Supermarket chain not found"));

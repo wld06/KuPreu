@@ -6,6 +6,7 @@ import com.kupreu.api.exception.BadRequestException;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kupreu.api.DTOs.Category.CategoryResponse;
 import com.kupreu.api.DTOs.Subcategory.SubcategoryRequest;
@@ -20,6 +21,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class SubcategoryService {
     private final SubcategoryRepository subcategoryRepository;
     private final CategoryRepository categoryRepository;
@@ -30,12 +32,14 @@ public class SubcategoryService {
         return toResponseWithCategory(sub);
     }
 
+    @Transactional
     public void delete(UUID id){
         Subcategory subcategory = subcategoryRepository.findById(id)
                                     .orElseThrow(() -> new NotFoundException("Subcategory with id " + id + " does not exist"));
         subcategoryRepository.delete(subcategory);
     }
 
+    @Transactional
     public SubcategoryWithCategory update(UUID id, SubcategoryRequest request){
         Subcategory subcategory = subcategoryRepository.findById(id)
                                     .orElseThrow(() -> new NotFoundException("Subcategory not found"));
@@ -51,6 +55,7 @@ public class SubcategoryService {
         return toResponseWithCategory(subcategory);
     }
 
+    @Transactional
     public SubcategoryWithCategory create(SubcategoryRequest request){
         if (request.getCategoryId() == null){
             throw new BadRequestException("A category id is required");

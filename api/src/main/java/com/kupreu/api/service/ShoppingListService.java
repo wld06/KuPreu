@@ -14,6 +14,7 @@ import com.kupreu.api.repository.ShoppingListRepository;
 import com.kupreu.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class ShoppingListService {
     private final ShoppingListRepository repository;
     private final UserRepository userRepository;
@@ -44,6 +46,7 @@ public class ShoppingListService {
         return toResponse(sl);
     }
 
+    @Transactional
     public ShoppingListResponse create(ShoppingListRequest request, String username){
         if (repository.existsByName(request.getName())){
             throw new ConflictException("A shopping list with the same name exists");
@@ -62,6 +65,7 @@ public class ShoppingListService {
         return toResponse(sl);
     }
 
+    @Transactional
     public ShoppingListResponse update(UUID id, ShoppingListRequest request, String username){
         ShoppingList sl = getShoppingListIfAuthenticated(id, username);
 
@@ -72,6 +76,7 @@ public class ShoppingListService {
         return toResponse(sl);
     }
 
+    @Transactional
     public void delete(UUID id, String username){
         ShoppingList sl = getShoppingListIfAuthenticated(id, username);
 
@@ -96,6 +101,7 @@ public class ShoppingListService {
 
     // ITEMS
 
+    @Transactional
     public ShoppingListResponse addItem(UUID shoppingListId, ShoppingListItemRequest request, String username){
         ShoppingList sl = getShoppingListIfAuthenticated(shoppingListId, username);
 
@@ -128,6 +134,7 @@ public class ShoppingListService {
         return toResponse(sl);
     }
 
+    @Transactional
     public ShoppingListResponse updateQuantityItem(UUID shoppingListId, UUID shoppingListItemId, ShoppingListItemUpdateQtyRequest request, String username){
 
         // For security we check the shopping list is for the user
@@ -147,6 +154,7 @@ public class ShoppingListService {
         return toResponse(sl);
     }
 
+    @Transactional
     public ShoppingListResponse deleteItem(UUID shoppingListId, UUID shoppingListItemId, String username){
         ShoppingList sl = getShoppingListIfAuthenticated(shoppingListId, username);
 

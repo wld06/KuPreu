@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kupreu.api.DTOs.DateDIMDTO;
 import com.kupreu.api.DTOs.PriceSnapshot.PriceSnapshotRequest;
@@ -28,6 +29,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class PriceSnapshotService {
     private final PriceSnapshotRepository priceSnapshotRepository;
     private final StoreRepository storeRepository;
@@ -58,6 +60,7 @@ public class PriceSnapshotService {
             .collect(Collectors.toList());
     }
 
+    @Transactional
     public PriceSnapshotResponse updateEndDate(LocalDateTime dateEnd, PriceSnapshotId id){
         PriceSnapshot priceSnapshot = priceSnapshotRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("Price snapshot not found with id: " + id));
@@ -69,6 +72,7 @@ public class PriceSnapshotService {
         return toResponse(priceSnapshotRepository.save(priceSnapshot));
     }
 
+    @Transactional
     public PriceSnapshotResponse create(PriceSnapshotRequest request){
         Product product = productRepository.findById(request.getProductId())
             .orElseThrow(() -> new NotFoundException("Product not found with id: " + request.getProductId()));
