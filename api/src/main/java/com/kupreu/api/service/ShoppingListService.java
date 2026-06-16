@@ -47,12 +47,12 @@ public class ShoppingListService {
 
     @Transactional
     public ShoppingListResponse create(ShoppingListRequest request, String username){
-        if (repository.existsByName(request.getName())){
-            throw new ConflictException("A shopping list with the same name exists");
-        }
-
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (repository.existsByNameAndUser(request.getName(), user)){
+            throw new ConflictException("A shopping list with the same name exists");
+        }
 
         ShoppingList sl = ShoppingList.builder()
                 .name(request.getName())

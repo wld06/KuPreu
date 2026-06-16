@@ -3,6 +3,7 @@ package com.kupreu.api.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -156,8 +157,8 @@ class ShoppingListServiceTest {
     @Test
     void create_newName_saves() {
         ShoppingListRequest req = new ShoppingListRequest("Nueva");
-        when(repository.existsByName("Nueva")).thenReturn(false);
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user()));
+        when(repository.existsByNameAndUser(eq("Nueva"), any(User.class))).thenReturn(false);
         when(repository.save(any(ShoppingList.class))).thenAnswer(i -> {
             ShoppingList sl = i.getArgument(0);
             sl.setId(LIST_ID);
@@ -174,7 +175,8 @@ class ShoppingListServiceTest {
     @Test
     void create_duplicateName_throws() {
         ShoppingListRequest req = new ShoppingListRequest("Compra semanal");
-        when(repository.existsByName("Compra semanal")).thenReturn(true);
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user()));
+        when(repository.existsByNameAndUser(eq("Compra semanal"), any(User.class))).thenReturn(true);
 
         assertThatThrownBy(() -> service.create(req, EMAIL))
                 .isInstanceOf(RuntimeException.class)

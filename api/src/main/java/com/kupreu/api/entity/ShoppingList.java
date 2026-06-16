@@ -14,7 +14,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "shopping_list")
+@Table(name = "shopping_list",
+       uniqueConstraints = @UniqueConstraint(name = "uq_shopping_list_user_name", columnNames = {"id_user", "name"}))
 @Getter
 @Setter
 @ToString
