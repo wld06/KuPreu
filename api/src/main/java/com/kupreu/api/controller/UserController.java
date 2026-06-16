@@ -19,6 +19,7 @@ import com.kupreu.api.DTOs.Roles.AdminRequest;
 import com.kupreu.api.DTOs.Roles.AdminResponse;
 import com.kupreu.api.service.Users.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -45,7 +46,7 @@ public class UserController {
 
     @PutMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AdminResponse> updateUser(@PathVariable UUID id, @RequestBody AdminRequest request) {
+    public ResponseEntity<AdminResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody AdminRequest request) {
         AdminResponse response = userService.updateUserRole(id, request.isAdmin());
         return ResponseEntity.ok(response);
     }

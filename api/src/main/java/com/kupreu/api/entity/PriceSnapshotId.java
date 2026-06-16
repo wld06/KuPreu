@@ -25,7 +25,4 @@ public class PriceSnapshotId implements Serializable {
 
     @Column(name = "id_date_start")
     private UUID dateStartId;
-
-    @Column(name = "id_date_end")
-    private UUID dateEndId;
 }

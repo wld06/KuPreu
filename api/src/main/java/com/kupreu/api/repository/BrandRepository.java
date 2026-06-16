@@ -11,5 +11,5 @@ import com.kupreu.api.entity.Brand;
 
 @Repository
 public interface BrandRepository extends JpaRepository<Brand, UUID>, JpaSpecificationExecutor<Brand> {
-    List<Brand> findByBrandName(String brandName);
+    List<Brand> findByName(String name);
 }

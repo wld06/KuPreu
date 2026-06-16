@@ -79,14 +79,15 @@ public class PriceSnapshotService {
         DateDIM dateStart = dateDIMRepository.findByDate(request.getDateStart())
             .orElseGet(() -> dateDIMRepository.save(DateDIM.builder().date(request.getDateStart()).build()));
         
-        DateDIM dateEnd = dateDIMRepository.findByDate(request.getDateEnd())
-            .orElseGet(() -> dateDIMRepository.save(DateDIM.builder().date(request.getDateEnd()).build()));
-        
+        DateDIM dateEnd = request.getDateEnd() == null
+            ? null
+            : dateDIMRepository.findByDate(request.getDateEnd())
+                .orElseGet(() -> dateDIMRepository.save(DateDIM.builder().date(request.getDateEnd()).build()));
+
         PriceSnapshotId id = PriceSnapshotId.builder()
             .productId(request.getProductId())
             .storeId(request.getStoreId())
             .dateStartId(dateStart.getId())
-            .dateEndId(dateEnd.getId())
             .build();
         
         PriceSnapshot priceSnapshot = PriceSnapshot.builder()

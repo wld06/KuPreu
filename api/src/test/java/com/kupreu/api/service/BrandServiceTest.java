@@ -57,12 +57,12 @@ class BrandServiceTest {
         when(brandRepository.findAll()).thenReturn(List.of(entity("Hacendado")));
 
         assertThat(brandService.getAll("   ")).hasSize(1);
-        verify(brandRepository, never()).findByBrandName(any());
+        verify(brandRepository, never()).findByName(any());
     }
 
     @Test
-    void getAll_withFilter_delegatesToFindByBrandName() {
-        when(brandRepository.findByBrandName("Pascual")).thenReturn(List.of(entity("Pascual")));
+    void getAll_withFilter_delegatesToFindByName() {
+        when(brandRepository.findByName("Pascual")).thenReturn(List.of(entity("Pascual")));
 
         List<BrandResponse> result = brandService.getAll("Pascual");
 

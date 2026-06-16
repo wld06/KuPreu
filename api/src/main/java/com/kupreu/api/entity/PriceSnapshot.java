@@ -46,7 +46,6 @@ public class PriceSnapshot {
     private DateDIM dateStart;
 
     @ManyToOne
-    @MapsId("dateEndId")
     @JoinColumn(name = "id_date_end", nullable = true)
     private DateDIM dateEnd;
 

@@ -16,6 +16,7 @@ import com.kupreu.api.DTOs.PriceSnapshot.PriceSnapshotRequest;
 import com.kupreu.api.DTOs.PriceSnapshot.PriceSnapshotResponse;
 import com.kupreu.api.service.PriceSnapshotService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -40,7 +41,7 @@ public class PriceSnapshotController {
     }
 
     @PostMapping("/prices")
-    public ResponseEntity<PriceSnapshotResponse> createPriceSnapshot(@RequestBody PriceSnapshotRequest request){
+    public ResponseEntity<PriceSnapshotResponse> createPriceSnapshot(@Valid @RequestBody PriceSnapshotRequest request){
         return ResponseEntity.ok(priceSnapshotService.create(request));
     }
 }

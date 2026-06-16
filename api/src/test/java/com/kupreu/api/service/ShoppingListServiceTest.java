@@ -82,11 +82,15 @@ class ShoppingListServiceTest {
     }
 
     private ShoppingList list(User owner, ShoppingListItem... items) {
-        return ShoppingList.builder()
+        ShoppingList sl = ShoppingList.builder()
                 .id(LIST_ID).name("Compra semanal").createdAt(LocalDateTime.of(2026, 6, 1, 0, 0))
                 .user(owner)
                 .items(new ArrayList<>(List.of(items)))
                 .build();
+        for (ShoppingListItem it : items) {
+            it.setShoppingList(sl);
+        }
+        return sl;
     }
 
     // ── getAll ───────────────────────────────────────────────────────────────────
@@ -259,8 +263,8 @@ class ShoppingListServiceTest {
         ShoppingListResponse res = service.addItem(LIST_ID, req, EMAIL);
 
         assertThat(res.getShoppingListItems()).hasSize(1);
-        // NOTE: current impl increments by 1, ignoring request.getQuantity()
-        assertThat(res.getShoppingListItems().get(0).getQuantity()).isEqualTo(3);
+        // Existing item: quantity is increased by the requested amount (2 + 5)
+        assertThat(res.getShoppingListItems().get(0).getQuantity()).isEqualTo(7);
         verify(psRepository, never()).findByUuid(any());
     }
 

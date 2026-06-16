@@ -25,7 +25,7 @@ public class BrandService {
     public List<BrandResponse> getAll(String brandName){
 
         if (brandName != null && !brandName.isBlank()){
-            return brandRepository.findByBrandName(brandName)
+            return brandRepository.findByName(brandName)
                     .stream()
                     .map(this::toResponse)
                     .collect(Collectors.toList());

@@ -38,12 +38,12 @@ public class ShoppingListController {
     }
 
     @PostMapping
-    public ResponseEntity<ShoppingListResponse> create(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ShoppingListRequest request){
+    public ResponseEntity<ShoppingListResponse> create(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody ShoppingListRequest request){
         return ResponseEntity.ok(service.create(request, userDetails.getUsername()));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ShoppingListResponse> update(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails, @RequestBody ShoppingListRequest request){
+    public ResponseEntity<ShoppingListResponse> update(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody ShoppingListRequest request){
         return ResponseEntity.ok(service.update(id, request, userDetails.getUsername()));
     }
 

@@ -143,11 +143,11 @@ class PriceSnapshotControllerTest {
     @org.springframework.security.test.context.support.WithMockUser(roles = "USER")
     void create_authenticated_returns200() throws Exception {
         PriceSnapshotRequest req = new PriceSnapshotRequest();
-        req.productId = PRODUCT_ID;
-        req.storeId = STORE_ID;
-        req.price = new BigDecimal("1.50");
-        req.dateStart = LocalDateTime.of(2026, 1, 1, 0, 0);
-        req.dateEnd = LocalDateTime.of(2026, 2, 1, 0, 0);
+        req.setProductId(PRODUCT_ID);
+        req.setStoreId(STORE_ID);
+        req.setPrice(new BigDecimal("1.50"));
+        req.setDateStart(LocalDateTime.of(2026, 1, 1, 0, 0));
+        req.setDateEnd(LocalDateTime.of(2026, 2, 1, 0, 0));
 
         when(priceSnapshotService.create(any(PriceSnapshotRequest.class))).thenReturn(sample());
 

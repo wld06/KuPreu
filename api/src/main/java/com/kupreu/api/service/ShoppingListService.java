@@ -108,17 +108,19 @@ public class ShoppingListService {
 
             PriceSnapshot ps = psRepository.findByUuid(request.getPriceSnapshotUuid());
 
+            if (ps == null){
+                throw new NotFoundException("Price snapshot not found");
+            }
+
             sl.getItems().add(
                     ShoppingListItem.builder()
                             .quantity(request.getQuantity())
                             .priceSnapshot(ps)
+                            .shoppingList(sl)
                             .build()
             );
-
-            repository.save(sl);
         }else{
-            Integer q = item.getQuantity();
-            item.setQuantity(q + 1);
+            item.setQuantity(item.getQuantity() + request.getQuantity());
         }
 
         repository.save(sl);
@@ -134,6 +136,10 @@ public class ShoppingListService {
         ShoppingListItem item = sliRepository.findById(shoppingListItemId)
                 .orElseThrow(() -> new NotFoundException("A shopping list item id is required"));
 
+        if (!item.getShoppingList().getId().equals(sl.getId())){
+            throw new NotFoundException("The shopping list item is not found");
+        }
+
         item.setQuantity(request.getQuantity());
 
         sliRepository.save(item);
@@ -146,6 +152,10 @@ public class ShoppingListService {
 
         ShoppingListItem item = sliRepository.findById(shoppingListItemId)
                 .orElseThrow(() -> new NotFoundException("A shopping list item id is required"));
+
+        if (!item.getShoppingList().getId().equals(sl.getId())){
+            throw new NotFoundException("The shopping list item is not found");
+        }
 
         sliRepository.delete(item);
 

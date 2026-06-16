@@ -67,11 +67,11 @@ class PriceSnapshotServiceTest {
 
     private PriceSnapshotRequest request(LocalDateTime start, LocalDateTime end) {
         PriceSnapshotRequest req = new PriceSnapshotRequest();
-        req.productId = PRODUCT_ID;
-        req.storeId = STORE_ID;
-        req.price = new BigDecimal("1.50");
-        req.dateStart = start;
-        req.dateEnd = end;
+        req.setProductId(PRODUCT_ID);
+        req.setStoreId(STORE_ID);
+        req.setPrice(new BigDecimal("1.50"));
+        req.setDateStart(start);
+        req.setDateEnd(end);
         return req;
     }
 
