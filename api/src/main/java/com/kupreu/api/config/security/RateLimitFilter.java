@@ -53,16 +53,27 @@ public class RateLimitFilter extends OncePerRequestFilter{
         // Real client IP: server.forward-headers-strategy=framework makes Spring
         // rewrite getRemoteAddr() from X-Forwarded-For/Forwarded when behind a proxy.
         String ip = request.getRemoteAddr();
-
+        boolean allowed;
         byte[] key = ("rate_limit:" + ip).getBytes(StandardCharsets.UTF_8);
 
-        Bucket bucket = buckets.builder()
-                        .build(key, this::bucketConfig);
-        
-        if (bucket.tryConsume(1)) {
+        try{
+            Bucket bucket = buckets.builder()
+                    .build(key, this::bucketConfig);
+            allowed = bucket.tryConsume(1);
+        } catch (Exception e){
+            //log
+            response.setStatus(503); //service unavailable
+            response.setHeader("Retry-After", "5"); //seconds
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"Service temporarily unavailable\"}");
+            return;
+        }
+
+        if (allowed){
             chain.doFilter(request, response);
-        } else {
+        } else{
             response.setStatus(429);
+            response.setHeader("Retry-After", "60");
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Too many requests\"}");
         }
