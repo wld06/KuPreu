@@ -14,7 +14,7 @@ create table store (id binary(16) not null, address varchar(255) not null, id_po
 create table subcategory (id binary(16) not null, name varchar(255) not null, id_category binary(16) not null, primary key (id)) engine=InnoDB;
 create table supermarket_chain (Id binary(16) not null, name varchar(255) not null, primary key (Id)) engine=InnoDB;
 create table unit_of_measure (Id binary(16) not null, name varchar(255) not null, symbol varchar(255) not null, primary key (Id)) engine=InnoDB;
-create table users (id binary(16) not null, createdAt datetime(6) not null, email varchar(255) not null, is_admin bit not null, name varchar(255) not null, password varchar(255) not null, surname varchar(255) not null, username varchar(255) not null, id_postal_code binary(16), primary key (id)) engine=InnoDB;
+create table users (id binary(16) not null, created_at datetime(6) not null, email varchar(255) not null, is_admin bit not null, name varchar(255) not null, password varchar(255) not null, surname varchar(255) not null, username varchar(255) not null, id_postal_code binary(16), primary key (id)) engine=InnoDB;
 
 alter table attribute add constraint UKhpwum0iq12fs4ej5d0tgy6wsn unique (name);
 alter table brand add constraint UKrdxh7tq2xs66r485cc8dkxt77 unique (name);
