@@ -1,5 +1,6 @@
 package com.kupreu.api.service.Users;
 
+import com.kupreu.api.exception.BadRequestException;
 import com.kupreu.api.exception.NotFoundException;
 
 import java.util.UUID;
@@ -84,8 +85,12 @@ public class ProfileService {
     public void updatePassword(UserDetails userDetails, PasswordRequest request){
         User user = userRepository.findByEmail(userDetails.getUsername())
                         .orElseThrow(() -> new NotFoundException("User not found"));
-        
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        if (!passwordEncoder.matches(request.getActualPassword(), user.getPassword())){
+            throw new BadRequestException("Current password incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
 }

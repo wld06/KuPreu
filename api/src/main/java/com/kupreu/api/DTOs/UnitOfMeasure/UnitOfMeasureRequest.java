@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UnitOfMeasureRequest {
-    public String name;
-    public String symbol;
+    private String name;
+    private String symbol;
 }

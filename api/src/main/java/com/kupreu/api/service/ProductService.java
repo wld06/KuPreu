@@ -55,20 +55,20 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
 
-        if (!product.getName().equals(request.name) && productRepository.existsByName(request.name)){
+        if (!product.getName().equals(request.getName()) && productRepository.existsByName(request.getName())){
             throw new ConflictException("Product with the same name already exists");
         }
 
-        Subcategory subcategory = subcategoryRepository.findById(request.subcategoryId)
+        Subcategory subcategory = subcategoryRepository.findById(request.getSubcategoryId())
             .orElseThrow(() -> new NotFoundException("Subcategory not found"));
-       Brand brand = brandRepository.findById(request.brandId)
+       Brand brand = brandRepository.findById(request.getBrandId())
             .orElseThrow(() -> new NotFoundException("Brand not found"));
-       UnitOfMeasure unitOfMeasure = unitOfMeasureRepository.findById(request.unitOfMeasureId)
+       UnitOfMeasure unitOfMeasure = unitOfMeasureRepository.findById(request.getUnitOfMeasureId())
             .orElseThrow(() -> new NotFoundException("Unit of Measure not found"));
         
-        product.setName(request.name);
-        product.setEan(request.ean);
-        product.setStockQty(request.stock);
+        product.setName(request.getName());
+        product.setEan(request.getEan());
+        product.setStockQty(request.getStock());
         product.setSubcategory(subcategory);
         product.setBrand(brand);
         product.setUnitOfMeasure(unitOfMeasure);
@@ -78,21 +78,21 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(ProductRequest request){
-       if (productRepository.existsByName(request.name)){
+       if (productRepository.existsByName(request.getName())){
             throw new ConflictException("Product with the same name already exists");
        }
 
-       Subcategory subcategory = subcategoryRepository.findById(request.subcategoryId)
+       Subcategory subcategory = subcategoryRepository.findById(request.getSubcategoryId())
             .orElseThrow(() -> new NotFoundException("Subcategory not found"));
-       Brand brand = brandRepository.findById(request.brandId)
+       Brand brand = brandRepository.findById(request.getBrandId())
             .orElseThrow(() -> new NotFoundException("Brand not found"));
-       UnitOfMeasure unitOfMeasure = unitOfMeasureRepository.findById(request.unitOfMeasureId)
+       UnitOfMeasure unitOfMeasure = unitOfMeasureRepository.findById(request.getUnitOfMeasureId())
             .orElseThrow(() -> new NotFoundException("Unit of Measure not found"));
 
        Product product = Product.builder()
-            .name(request.name)
-            .ean(request.ean)
-            .stockQty(request.stock)
+            .name(request.getName())
+            .ean(request.getEan())
+            .stockQty(request.getStock())
             .subcategory(subcategory)
             .brand(brand)
             .unitOfMeasure(unitOfMeasure)
@@ -121,7 +121,7 @@ public class ProductService {
     }
 
     public Page<ProductResponse> getProducts(String search, UUID categoryId, UUID subcategoryId, UUID brandId, Pageable pageable) {
-        Specification<Product> spec = Specification.where((Specification<Product>) null);
+        Specification<Product> spec = Specification.where(Specification.unrestricted());
 
         if (search != null && !search.isBlank()){
             spec = spec.and((root, q, cb) ->

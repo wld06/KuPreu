@@ -44,9 +44,9 @@ class ProfileServiceTest {
 
         ProfileResponse res = profileService.getMyProfile("ana@test.com");
 
-        assertThat(res.email).isEqualTo("ana@test.com");
-        assertThat(res.username).isEqualTo("ana");
-        assertThat(res.postalCode).isNull();
+        assertThat(res.getEmail()).isEqualTo("ana@test.com");
+        assertThat(res.getUsername()).isEqualTo("ana");
+        assertThat(res.getPostalCode()).isNull();
     }
 
     @Test
@@ -56,9 +56,9 @@ class ProfileServiceTest {
 
         ProfileResponse res = profileService.getMyProfile("ana@test.com");
 
-        assertThat(res.postalCode).isNotNull();
-        assertThat(res.postalCode.code).isEqualTo("28001");
-        assertThat(res.postalCode.city).isEqualTo("Madrid");
+        assertThat(res.getPostalCode()).isNotNull();
+        assertThat(res.getPostalCode().getCode()).isEqualTo("28001");
+        assertThat(res.getPostalCode().getCity()).isEqualTo("Madrid");
     }
 
     @Test
@@ -76,8 +76,8 @@ class ProfileServiceTest {
 
         ProfileResponse res = profileService.getProfileById(ID);
 
-        assertThat(res.id).isEqualTo(ID);
-        assertThat(res.email).isEqualTo("ana@test.com");
+        assertThat(res.getId()).isEqualTo(ID);
+        assertThat(res.getEmail()).isEqualTo("ana@test.com");
     }
 
     @Test
@@ -95,8 +95,8 @@ class ProfileServiceTest {
 
         ProfileResponse res = profileService.getProfileByEmail("ana@test.com");
 
-        assertThat(res.email).isEqualTo("ana@test.com");
-        assertThat(res.username).isEqualTo("ana");
+        assertThat(res.getEmail()).isEqualTo("ana@test.com");
+        assertThat(res.getUsername()).isEqualTo("ana");
     }
 
     @Test
@@ -112,12 +112,14 @@ class ProfileServiceTest {
     void updatePassword_found_encodesAndSaves() {
         User u = user(null);
         when(userRepository.findByEmail("ana@test.com")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("OldPass1!", "hashed")).thenReturn(true);
         when(passwordEncoder.encode("NewPass1!")).thenReturn("new-hash");
 
         UserDetails principal = org.springframework.security.core.userdetails.User.builder()
                 .username("ana@test.com").password("hashed").roles("USER").build();
         PasswordRequest req = new PasswordRequest();
-        req.password = "NewPass1!";
+        req.setActualPassword("OldPass1!");
+        req.setNewPassword("NewPass1!");
 
         profileService.updatePassword(principal, req);
 
@@ -127,13 +129,31 @@ class ProfileServiceTest {
     }
 
     @Test
+    void updatePassword_wrongCurrentPassword_throws() {
+        User u = user(null);
+        when(userRepository.findByEmail("ana@test.com")).thenReturn(Optional.of(u));
+        when(passwordEncoder.matches("WrongPass1!", "hashed")).thenReturn(false);
+
+        UserDetails principal = org.springframework.security.core.userdetails.User.builder()
+                .username("ana@test.com").password("hashed").roles("USER").build();
+        PasswordRequest req = new PasswordRequest();
+        req.setActualPassword("WrongPass1!");
+        req.setNewPassword("NewPass1!");
+
+        assertThatThrownBy(() -> profileService.updatePassword(principal, req))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Current password incorrect");
+        verify(userRepository, org.mockito.Mockito.never()).save(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
     void updatePassword_userNotFound_throws() {
         when(userRepository.findByEmail("ghost@test.com")).thenReturn(Optional.empty());
 
         UserDetails principal = org.springframework.security.core.userdetails.User.builder()
                 .username("ghost@test.com").password("x").roles("USER").build();
         PasswordRequest req = new PasswordRequest();
-        req.password = "NewPass1!";
+        req.setNewPassword("NewPass1!");
 
         assertThatThrownBy(() -> profileService.updatePassword(principal, req))
                 .isInstanceOf(RuntimeException.class)

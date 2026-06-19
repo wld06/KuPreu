@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 @Builder
 public class SubcategoryWithCategory {
-    public UUID id;
-    public String name;
-    public CategoryResponse category;
+    private UUID id;
+    private String name;
+    private CategoryResponse category;
 }

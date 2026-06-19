@@ -8,11 +8,11 @@ import lombok.Data;
 @Data
 @Builder
 public class ProductResponse {
-    public UUID id;
-    public String ean;
-    public String name;
-    public int stockQty;
-    public String subcategoryName;
-    public String brandName;
-    public String unitOfMeasureName;
+    private UUID id;
+    private String ean;
+    private String name;
+    private int stockQty;
+    private String subcategoryName;
+    private String brandName;
+    private String unitOfMeasureName;
 }

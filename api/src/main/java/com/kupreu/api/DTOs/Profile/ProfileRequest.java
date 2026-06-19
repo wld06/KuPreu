@@ -8,5 +8,5 @@ import lombok.Data;
 public class ProfileRequest {
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
-    public String email;
+    private String email;
 }

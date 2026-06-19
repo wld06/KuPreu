@@ -33,6 +33,10 @@ public class AuthService {
             throw new ConflictException("Email already in use");
         }
 
+        if (userRepository.existsByUsername(request.getUsername())){
+            throw new ConflictException("Username already in use");
+        }
+
         User user = User.builder()
                 .email(request.getEmail())
                 .username(request.getUsername())

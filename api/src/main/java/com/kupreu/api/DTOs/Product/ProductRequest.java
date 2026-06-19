@@ -11,19 +11,19 @@ import lombok.Data;
 public class ProductRequest {
     @NotBlank(message = "Name is required")
     @Size(max = 100, message = "Name must be at most 100 characters")
-    public String name;
+    private String name;
 
     @Size(max = 50, message = "EAN must be at most 50 characters")
-    public String ean;
+    private String ean;
 
-    public int stock;
+    private int stock;
 
     @NotNull(message = "Subcategory ID is required")
-    public UUID subcategoryId;
+    private UUID subcategoryId;
 
     @NotNull(message = "Brand ID is required")
-    public UUID brandId;
+    private UUID brandId;
 
     @NotNull(message = "Unit of Measure ID is required")
-    public UUID unitOfMeasureId;
+    private UUID unitOfMeasureId;
 }

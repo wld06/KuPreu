@@ -8,7 +8,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class SupermarketChainResponse {
-    public UUID id;
-    public String name;
-    public long storeCount;
+    private UUID id;
+    private String name;
+    private long storeCount;
 }

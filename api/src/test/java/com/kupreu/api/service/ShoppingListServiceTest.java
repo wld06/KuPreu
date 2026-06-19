@@ -25,6 +25,7 @@ import com.kupreu.api.DTOs.ShoppingList.ShoppingListItemRequest;
 import com.kupreu.api.DTOs.ShoppingList.ShoppingListItemUpdateQtyRequest;
 import com.kupreu.api.DTOs.ShoppingList.ShoppingListRequest;
 import com.kupreu.api.DTOs.ShoppingList.ShoppingListResponse;
+import com.kupreu.api.entity.Brand;
 import com.kupreu.api.entity.DateDIM;
 import com.kupreu.api.entity.PriceSnapshot;
 import com.kupreu.api.entity.Product;
@@ -70,7 +71,8 @@ class ShoppingListServiceTest {
     private PriceSnapshot priceSnapshot(UUID uuid, BigDecimal price, DateDIM dateEnd) {
         return PriceSnapshot.builder()
                 .uuid(uuid)
-                .product(Product.builder().id(PRODUCT_ID).name("Leche").build())
+                .product(Product.builder().id(PRODUCT_ID).name("Leche")
+                        .brand(Brand.builder().Id(UUID.randomUUID()).name("Pascual").build()).build())
                 .store(store())
                 .dateStart(DateDIM.builder().id(UUID.randomUUID()).date(LocalDateTime.of(2026, 1, 1, 0, 0)).build())
                 .dateEnd(dateEnd)

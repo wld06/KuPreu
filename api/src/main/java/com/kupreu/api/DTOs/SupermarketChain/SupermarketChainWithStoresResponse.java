@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class SupermarketChainWithStoresResponse {
-    public UUID id;
-    public String name;
-    public List<StoreResponse> stores;
+    private UUID id;
+    private String name;
+    private List<StoreResponse> stores;
 }

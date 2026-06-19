@@ -42,7 +42,7 @@ public class ProfileController {
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProfileResponse> getProfileByEmail(@Valid @RequestBody ProfileRequest request){
-        return ResponseEntity.ok(profileService.getProfileByEmail(request.email));
+        return ResponseEntity.ok(profileService.getProfileByEmail(request.getEmail()));
     }
 
     @PutMapping("/update/password")

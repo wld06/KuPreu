@@ -8,6 +8,6 @@ import lombok.Data;
 @Data
 @Builder
 public class SubcategoryResponse {
-    public UUID id;
-    public String name;
+    private UUID id;
+    private String name;
 }

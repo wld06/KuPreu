@@ -12,9 +12,9 @@ import lombok.Data;
 @Data
 @Builder
 public class PriceSnapshotResponse {
-    public UUID uuid;
-    public StoreResponse store;
-    public BigDecimal price;
-    public DateDIMDTO dateStart;
-    public DateDIMDTO dateEnd;
+    private UUID uuid;
+    private StoreResponse store;
+    private BigDecimal price;
+    private DateDIMDTO dateStart;
+    private DateDIMDTO dateEnd;
 }

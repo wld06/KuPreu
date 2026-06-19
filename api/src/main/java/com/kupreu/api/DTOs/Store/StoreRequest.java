@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Data
 public class StoreRequest {
-    public String address;
-    public UUID supermarketChainId;
-    public String postalCode;
+    private String address;
+    private UUID supermarketChainId;
+    private String postalCode;
 }

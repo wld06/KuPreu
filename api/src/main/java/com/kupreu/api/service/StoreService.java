@@ -46,10 +46,10 @@ public class StoreService {
         SupermarketChain smChain = smChainRepository.findById(request.getSupermarketChainId())
                 .orElseThrow(() -> new NotFoundException("A supermarket cchain is required"));
 
-        PostalCode postalCode = postalCodeRepository.findByCode(request.postalCode)
+        PostalCode postalCode = postalCodeRepository.findByCode(request.getPostalCode())
                 .orElseThrow(() -> new NotFoundException("A postal code is required"));
 
-        if (request.address == null || request.address.isBlank()){
+        if (request.getAddress() == null || request.getAddress().isBlank()){
             throw new BadRequestException("An address is required");
         }
 
@@ -78,13 +78,13 @@ public class StoreService {
         }
 
         if (request.getPostalCode() != null && !request.getPostalCode().isBlank()){
-            PostalCode postalCode = postalCodeRepository.findByCode(request.postalCode)
+            PostalCode postalCode = postalCodeRepository.findByCode(request.getPostalCode())
                     .orElseThrow(() -> new NotFoundException("A postal code is required"));
 
             store.setPostalCode(postalCode);
         }
 
-        if (request.address == null || request.address.isBlank()){
+        if (request.getAddress() == null || request.getAddress().isBlank()){
             throw new BadRequestException("An address is required");
         }
 

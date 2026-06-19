@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 @Builder
 public class DateDIMDTO {
-    public UUID id;
-    public LocalDateTime date;
+    private UUID id;
+    private LocalDateTime date;
 }

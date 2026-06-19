@@ -75,12 +75,12 @@ class ProductControllerTest {
 
     private ProductRequest request(String name) {
         ProductRequest req = new ProductRequest();
-        req.name = name;
-        req.ean = "1234567890123";
-        req.stock = 10;
-        req.subcategoryId = UUID.randomUUID();
-        req.brandId = UUID.randomUUID();
-        req.unitOfMeasureId = UUID.randomUUID();
+        req.setName(name);
+        req.setEan("1234567890123");
+        req.setStock(10);
+        req.setSubcategoryId(UUID.randomUUID());
+        req.setBrandId(UUID.randomUUID());
+        req.setUnitOfMeasureId(UUID.randomUUID());
         return req;
     }
 

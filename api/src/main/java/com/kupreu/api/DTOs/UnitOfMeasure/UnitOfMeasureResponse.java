@@ -8,7 +8,7 @@ import java.util.UUID;
 @Data
 @Builder
 public class UnitOfMeasureResponse {
-    public UUID id;
-    public String name;
-    public String symbol;
+    private UUID id;
+    private String name;
+    private String symbol;
 }

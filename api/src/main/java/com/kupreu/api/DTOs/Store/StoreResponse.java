@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class StoreResponse {
-    public UUID id;
-    public String address;
-    public String chain;
+    private UUID id;
+    private String address;
+    private String chain;
 }

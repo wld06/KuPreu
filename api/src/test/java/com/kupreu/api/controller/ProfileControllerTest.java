@@ -139,7 +139,7 @@ class ProfileControllerTest {
     @WithMockUser(roles = "ADMIN")
     void getProfileByEmail_adminRole_returns200() throws Exception {
         ProfileRequest req = new ProfileRequest();
-        req.email = "ana@test.com";
+        req.setEmail("ana@test.com");
 
         when(profileService.getProfileByEmail("ana@test.com")).thenReturn(sample());
 
@@ -154,7 +154,7 @@ class ProfileControllerTest {
     @WithMockUser(roles = "USER")
     void getProfileByEmail_userRole_returns403() throws Exception {
         ProfileRequest req = new ProfileRequest();
-        req.email = "ana@test.com";
+        req.setEmail("ana@test.com");
 
         mockMvc.perform(get("/api/profile")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -166,7 +166,7 @@ class ProfileControllerTest {
     @WithMockUser(roles = "ADMIN")
     void getProfileByEmail_invalidEmail_returns400() throws Exception {
         ProfileRequest req = new ProfileRequest();
-        req.email = "not-an-email";
+        req.setEmail("not-an-email");
 
         mockMvc.perform(get("/api/profile")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -179,7 +179,7 @@ class ProfileControllerTest {
     @Test
     void updatePassword_anonymous_returns403() throws Exception {
         PasswordRequest req = new PasswordRequest();
-        req.password = "NewPass1!";
+        req.setNewPassword("NewPass1!");
 
         mockMvc.perform(put("/api/profile/update/password")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -191,7 +191,8 @@ class ProfileControllerTest {
     @WithMockUser(username = "ana@test.com", roles = "USER")
     void updatePassword_validRequest_returns200() throws Exception {
         PasswordRequest req = new PasswordRequest();
-        req.password = "NewPass1!";
+        req.setNewPassword("NewPass1!");
+        req.setActualPassword("OldPass1!");
 
         doNothing().when(profileService).updatePassword(any(UserDetails.class), any(PasswordRequest.class));
 
@@ -206,7 +207,7 @@ class ProfileControllerTest {
     @WithMockUser(username = "ana@test.com", roles = "USER")
     void updatePassword_weakPassword_returns400() throws Exception {
         PasswordRequest req = new PasswordRequest();
-        req.password = "weak";
+        req.setNewPassword("weak");
 
         mockMvc.perform(put("/api/profile/update/password")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -226,7 +227,8 @@ class ProfileControllerTest {
     @WithMockUser(username = "ghost@test.com", roles = "USER")
     void updatePassword_userNotFound_returns500() throws Exception {
         PasswordRequest req = new PasswordRequest();
-        req.password = "NewPass1!";
+        req.setNewPassword("NewPass1!");
+        req.setActualPassword("OldPass1!");
 
         doThrow(new RuntimeException("User not found"))
                 .when(profileService).updatePassword(any(UserDetails.class), any(PasswordRequest.class));

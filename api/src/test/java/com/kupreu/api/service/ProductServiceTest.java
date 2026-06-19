@@ -70,12 +70,12 @@ class ProductServiceTest {
 
     private ProductRequest request(String name) {
         ProductRequest req = new ProductRequest();
-        req.name = name;
-        req.ean = "1234567890123";
-        req.stock = 10;
-        req.subcategoryId = SUB_ID;
-        req.brandId = BRAND_ID;
-        req.unitOfMeasureId = UOM_ID;
+        req.setName(name);
+        req.setEan("1234567890123");
+        req.setStock(10);
+        req.setSubcategoryId(SUB_ID);
+        req.setBrandId(BRAND_ID);
+        req.setUnitOfMeasureId(UOM_ID);
         return req;
     }
 
@@ -137,11 +137,6 @@ class ProductServiceTest {
     }
 
     @Test
-    @org.junit.jupiter.api.Disabled("BUG: ProductService.getProducts builds the base spec with "
-            + "Specification.where((Specification) null), which throws "
-            + "IllegalArgumentException 'Specification must not be null' in this Spring Data "
-            + "version. GET /api/products fails at runtime. Re-enable once the base spec is built "
-            + "without a null argument (e.g. Specification.unrestricted()/allOf()).")
     @SuppressWarnings("unchecked")
     void getProducts_returnsMappedPage() {
         Pageable pageable = PageRequest.of(0, 20);

@@ -8,6 +8,6 @@ import java.util.UUID;
 @Data
 @Builder
 public class BrandResponse {
-    public UUID id;
-    public String name;
+    private UUID id;
+    private String name;
 }

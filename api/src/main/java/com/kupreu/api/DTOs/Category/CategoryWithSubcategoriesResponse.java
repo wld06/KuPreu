@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 @Builder
 public class CategoryWithSubcategoriesResponse {
-    public UUID id;
-    public String name;
-    public List<SubcategoryResponse> subcategories;
+    private UUID id;
+    private String name;
+    private List<SubcategoryResponse> subcategories;
 }

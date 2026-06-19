@@ -52,8 +52,8 @@ class UserServiceTest {
         Page<ProfileResponse> result = userService.getAllUsers(0, 20);
 
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).username).isEqualTo("ana");
-        assertThat(result.getContent().get(0).postalCode.city).isEqualTo("Madrid");
+        assertThat(result.getContent().get(0).getUsername()).isEqualTo("ana");
+        assertThat(result.getContent().get(0).getPostalCode().getCity()).isEqualTo("Madrid");
     }
 
     @Test
@@ -82,8 +82,8 @@ class UserServiceTest {
 
         AdminResponse res = userService.updateUserRole(ID, true);
 
-        assertThat(res.isAdmin).isTrue();
-        assertThat(res.username).isEqualTo("ana");
+        assertThat(res.isAdmin()).isTrue();
+        assertThat(res.getUsername()).isEqualTo("ana");
         assertThat(u.isAdmin()).isTrue();
         verify(userRepository).save(u);
     }
@@ -96,7 +96,7 @@ class UserServiceTest {
 
         AdminResponse res = userService.updateUserRole(ID, false);
 
-        assertThat(res.isAdmin).isFalse();
+        assertThat(res.isAdmin()).isFalse();
         assertThat(u.isAdmin()).isFalse();
     }
 

@@ -13,5 +13,8 @@ public class PasswordRequest {
         regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).+$",
         message = "Password must contain at least one lowercase letter, one uppercase letter, one digit and one special character"
     )
-    public String password;
+    private String newPassword;
+
+    @NotBlank(message = "Actual password is required")
+    private String actualPassword;
 }

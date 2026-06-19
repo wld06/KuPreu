@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class PostalCodeDTO {
-    public String code;
-    public String city;
+    private String code;
+    private String city;
 }

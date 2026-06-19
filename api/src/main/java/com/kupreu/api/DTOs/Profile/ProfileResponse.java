@@ -11,11 +11,11 @@ import lombok.Data;
 @Data
 @Builder
 public class ProfileResponse {
-    public UUID id;
-    public String username;
-    public String name;
-    public String surname;
-    public String email;
-    public PostalCodeDTO postalCode;
-    public LocalDateTime createdAt;
+    private UUID id;
+    private String username;
+    private String name;
+    private String surname;
+    private String email;
+    private PostalCodeDTO postalCode;
+    private LocalDateTime createdAt;
 }
