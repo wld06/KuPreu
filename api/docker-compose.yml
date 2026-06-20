@@ -48,9 +48,20 @@ services:
     networks:
       - app-network
 
+  mongo:
+    image: mongo:7
+    container_name: kupreu-mongo
+    ports:
+      - "27017:17017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
 volumes:
   mysql_data:
   redis_data:
+  mongo_data:
 
 networks:
   app-network:
