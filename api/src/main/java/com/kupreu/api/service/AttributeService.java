@@ -5,6 +5,7 @@ import com.kupreu.api.exception.BadRequestException;
 
 import com.kupreu.api.DTOs.Attribute.AttributeRequest;
 import com.kupreu.api.DTOs.Attribute.AttributeResponse;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.entity.Attribute;
 import com.kupreu.api.repository.AttributeRepository;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class AttributeService {
     private final AttributeRepository repository;
+    private final AuditService auditService;
 
     public List<AttributeResponse> getAll(){
         return repository.findAll()
@@ -47,6 +49,9 @@ public class AttributeService {
 
         att = repository.save(att);
 
+        auditService.record("ATTRIBUTE_CREATED", "Attribute created",
+                "id=" + att.getId() + ", name=" + att.getName(), true);
+
         return toResponse(att);
     }
 
@@ -62,6 +67,9 @@ public class AttributeService {
         att.setName(request.getName());
         repository.save(att);
 
+        auditService.record("ATTRIBUTE_UPDATED", "Attribute updated",
+                "id=" + id + ", name=" + att.getName(), true);
+
         return toResponse(att);
     }
 
@@ -71,6 +79,8 @@ public class AttributeService {
                 .orElseThrow(() -> new NotFoundException("Attribute not found"));
 
         repository.delete(att);
+
+        auditService.record("ATTRIBUTE_DELETED", "Attribute deleted", "id=" + id, true);
     }
 
     private AttributeResponse toResponse(Attribute attribute){

@@ -14,6 +14,7 @@ import com.kupreu.api.DTOs.Category.CategoryRequest;
 import com.kupreu.api.DTOs.Category.CategoryResponse;
 import com.kupreu.api.DTOs.Category.CategoryWithSubcategoriesResponse;
 import com.kupreu.api.DTOs.Subcategory.SubcategoryResponse;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.entity.Category;
 import com.kupreu.api.repository.CategoryRepository;
 import com.kupreu.api.repository.SubcategoryRepository;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final SubcategoryRepository subcategoryRepository;
+    private final AuditService auditService;
 
     public List<CategoryWithSubcategoriesResponse> getAll() {
         return categoryRepository.findAll()
@@ -49,8 +51,11 @@ public class CategoryService {
         Category category = Category.builder()
                                     .name(request.getName())
                                     .build();
-        
-        return toResponse(categoryRepository.save(category));
+
+        category = categoryRepository.save(category);
+        auditService.record("CATEGORY_CREATED", "Category created",
+                "id=" + category.getId() + ", name=" + category.getName(), true);
+        return toResponse(category);
     }
 
     @Transactional
@@ -58,7 +63,10 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                                 .orElseThrow(() -> new NotFoundException("Category not found"));
         category.setName(request.getName());
-        return toResponse(categoryRepository.save(category));
+        category = categoryRepository.save(category);
+        auditService.record("CATEGORY_UPDATED", "Category updated",
+                "id=" + id + ", name=" + category.getName(), true);
+        return toResponse(category);
     }
 
     @Transactional
@@ -68,6 +76,7 @@ public class CategoryService {
         }
 
         categoryRepository.deleteById(id);
+        auditService.record("CATEGORY_DELETED", "Category deleted", "id=" + id, true);
     }
 
     private CategoryWithSubcategoriesResponse toResponseWithSubcategories(Category category) {

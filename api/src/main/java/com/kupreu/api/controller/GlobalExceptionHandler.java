@@ -13,21 +13,31 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.exception.BadRequestException;
 import com.kupreu.api.exception.ConflictException;
 import com.kupreu.api.exception.NotFoundException;
 
+import lombok.RequiredArgsConstructor;
+
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final AuditService auditService;
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException e) {
+        auditService.record("ACCESS_DENIED", auditService.currentActor(),
+                "Access denied", e.getMessage(), false);
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Map.of("error", "Access denied"));
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, String>> handleAuthentication(AuthenticationException e) {
+        auditService.record("AUTHENTICATION_FAILED", auditService.currentActor(),
+                "Invalid credentials", e.getClass().getSimpleName(), false);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "Invalid credentials"));
     }
@@ -67,6 +77,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
+        auditService.record("UNHANDLED_ERROR", auditService.currentActor(),
+                "Unexpected error: " + e.getClass().getSimpleName(), e.getMessage(), false);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "An unexpected error occurred"));
     }

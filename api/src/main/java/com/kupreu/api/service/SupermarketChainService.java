@@ -8,6 +8,7 @@ import com.kupreu.api.DTOs.SupermarketChain.SupermarketChainResponse;
 import com.kupreu.api.DTOs.SupermarketChain.SupermarketChainWithStoresResponse;
 import com.kupreu.api.entity.Store;
 import com.kupreu.api.entity.SupermarketChain;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.repository.SupermarketChainRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SupermarketChainService {
     private final SupermarketChainRepository supermarketChainRepository;
+    private final AuditService auditService;
 
     public List<SupermarketChainResponse> getAll(){
         return supermarketChainRepository.findAll()
@@ -45,6 +47,9 @@ public class SupermarketChainService {
 
         smChain = supermarketChainRepository.save(smChain);
 
+        auditService.record("SUPERMARKET_CHAIN_CREATED", "Supermarket chain created",
+                "id=" + smChain.getId() + ", name=" + smChain.getName(), true);
+
         return getById(smChain.getId());
     }
 
@@ -56,6 +61,9 @@ public class SupermarketChainService {
         smChain.setName(request.getName());
         supermarketChainRepository.save(smChain);
 
+        auditService.record("SUPERMARKET_CHAIN_UPDATED", "Supermarket chain updated",
+                "id=" + id + ", name=" + smChain.getName(), true);
+
         return getById(smChain.getId());
     }
 
@@ -65,6 +73,8 @@ public class SupermarketChainService {
                 .orElseThrow(() -> new NotFoundException("Supermarket chain not found"));
 
         supermarketChainRepository.delete(smChain);
+
+        auditService.record("SUPERMARKET_CHAIN_DELETED", "Supermarket chain deleted", "id=" + id, true);
     }
 
     private SupermarketChainWithStoresResponse toResponseWithStore(SupermarketChain supermarketChain){

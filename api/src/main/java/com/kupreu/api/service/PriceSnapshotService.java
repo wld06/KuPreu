@@ -20,6 +20,7 @@ import com.kupreu.api.entity.PriceSnapshot;
 import com.kupreu.api.entity.PriceSnapshotId;
 import com.kupreu.api.entity.Product;
 import com.kupreu.api.entity.Store;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.repository.DateDIMRepository;
 import com.kupreu.api.repository.PriceSnapshotRepository;
 import com.kupreu.api.repository.ProductRepository;
@@ -35,6 +36,7 @@ public class PriceSnapshotService {
     private final StoreRepository storeRepository;
     private final DateDIMRepository dateDIMRepository;
     private final ProductRepository productRepository;
+    private final AuditService auditService;
 
     public List<PriceSnapshotResponse> getPriceSnapshotByProductId(UUID productId){
         List<PriceSnapshot> priceSnapshots = priceSnapshotRepository.findByProductId(productId);
@@ -69,7 +71,10 @@ public class PriceSnapshotService {
             .orElseGet(() -> dateDIMRepository.save(DateDIM.builder().date(dateEnd).build()));
         
         priceSnapshot.setDateEnd(dateEndDim);
-        return toResponse(priceSnapshotRepository.save(priceSnapshot));
+        PriceSnapshot saved = priceSnapshotRepository.save(priceSnapshot);
+        auditService.record("PRICE_SNAPSHOT_END_DATE_UPDATED", "Price snapshot end date updated",
+                "uuid=" + saved.getUuid() + ", dateEnd=" + dateEnd, true);
+        return toResponse(saved);
     }
 
     @Transactional
@@ -102,8 +107,12 @@ public class PriceSnapshotService {
             .dateEnd(dateEnd)
             .price(request.getPrice())
             .build();
-        
-        return toResponse(priceSnapshotRepository.save(priceSnapshot));
+
+        PriceSnapshot saved = priceSnapshotRepository.save(priceSnapshot);
+        auditService.record("PRICE_SNAPSHOT_CREATED", "Price snapshot created",
+                "uuid=" + saved.getUuid() + ", productId=" + request.getProductId()
+                        + ", storeId=" + request.getStoreId() + ", price=" + request.getPrice(), true);
+        return toResponse(saved);
     }
 
     public PriceSnapshotResponse getCheapest(UUID productId){

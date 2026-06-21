@@ -7,6 +7,7 @@ import com.kupreu.api.DTOs.DateDIMDTO;
 import com.kupreu.api.DTOs.PriceSnapshot.PriceSnapshotResponse;
 import com.kupreu.api.DTOs.ShoppingList.*;
 import com.kupreu.api.DTOs.Store.StoreResponse;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.entity.*;
 import com.kupreu.api.repository.PriceSnapshotRepository;
 import com.kupreu.api.repository.ShoppingListItemRepository;
@@ -28,6 +29,7 @@ public class ShoppingListService {
     private final UserRepository userRepository;
     private final PriceSnapshotRepository psRepository;
     private final ShoppingListItemRepository sliRepository;
+    private final AuditService auditService;
 
     public List<ShoppingListResponse> getAll(String username){
         User user = userRepository.findByEmail(username)
@@ -61,6 +63,9 @@ public class ShoppingListService {
 
         sl = repository.save(sl);
 
+        auditService.record("SHOPPING_LIST_CREATED", username, "Shopping list created",
+                "id=" + sl.getId() + ", name=" + sl.getName(), true);
+
         return toResponse(sl);
     }
 
@@ -72,6 +77,9 @@ public class ShoppingListService {
 
         sl = repository.save(sl);
 
+        auditService.record("SHOPPING_LIST_UPDATED", username, "Shopping list updated",
+                "id=" + id + ", name=" + sl.getName(), true);
+
         return toResponse(sl);
     }
 
@@ -80,6 +88,8 @@ public class ShoppingListService {
         ShoppingList sl = getShoppingListIfAuthenticated(id, username);
 
         repository.delete(sl);
+
+        auditService.record("SHOPPING_LIST_DELETED", username, "Shopping list deleted", "id=" + id, true);
     }
 
     public ShoppingListResponse getCheapestList(UUID id, String username){
@@ -130,6 +140,9 @@ public class ShoppingListService {
 
         repository.save(sl);
 
+        auditService.record("SHOPPING_LIST_ITEM_ADDED", username, "Item added to shopping list",
+                "shoppingListId=" + shoppingListId + ", priceSnapshotUuid=" + request.getPriceSnapshotUuid(), true);
+
         return toResponse(sl);
     }
 
@@ -150,6 +163,9 @@ public class ShoppingListService {
 
         sliRepository.save(item);
 
+        auditService.record("SHOPPING_LIST_ITEM_QTY_UPDATED", username, "Shopping list item quantity updated",
+                "shoppingListId=" + shoppingListId + ", itemId=" + shoppingListItemId + ", quantity=" + request.getQuantity(), true);
+
         return toResponse(sl);
     }
 
@@ -165,6 +181,9 @@ public class ShoppingListService {
         }
 
         sliRepository.delete(item);
+
+        auditService.record("SHOPPING_LIST_ITEM_DELETED", username, "Item removed from shopping list",
+                "shoppingListId=" + shoppingListId + ", itemId=" + shoppingListItemId, true);
 
         return toResponse(sl);
     }

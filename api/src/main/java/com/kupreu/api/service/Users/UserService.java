@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kupreu.api.DTOs.PostalCodeDTO;
 import com.kupreu.api.DTOs.Profile.ProfileResponse;
 import com.kupreu.api.DTOs.Roles.AdminResponse;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.entity.User;
 import com.kupreu.api.repository.UserRepository;
 
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
+    private final AuditService auditService;
 
     public Page<ProfileResponse> getAllUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -33,6 +35,8 @@ public class UserService {
     @Transactional
     public void deleteUser(UUID id){
         userRepository.deleteById(id);
+        auditService.record("USER_DELETED", "admin",
+                "User deleted", "id=" + id, true);
     }
 
     @Transactional
@@ -40,6 +44,10 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
         user.setAdmin(isAdmin);
         userRepository.save(user);
+
+        auditService.record("ROLE_CHANGED", user.getEmail(),
+                "User role updated", "isAdmin=" + isAdmin, true);
+
         return AdminResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())

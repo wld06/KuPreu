@@ -5,6 +5,7 @@ import com.kupreu.api.exception.BadRequestException;
 
 import com.kupreu.api.DTOs.UnitOfMeasure.UnitOfMeasureRequest;
 import com.kupreu.api.DTOs.UnitOfMeasure.UnitOfMeasureResponse;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.entity.UnitOfMeasure;
 import com.kupreu.api.repository.UnitOfMeasureRepository;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class UnitOfMeasureService {
     private final UnitOfMeasureRepository repository;
+    private final AuditService auditService;
 
     public List<UnitOfMeasureResponse> getAll(){
         return repository.findAll()
@@ -50,6 +52,9 @@ public class UnitOfMeasureService {
 
         repository.save(unit);
 
+        auditService.record("UNIT_OF_MEASURE_UPDATED", "Unit of measure updated",
+                "id=" + id + ", name=" + unit.getName(), true);
+
         return getById(unit.getId());
     }
 
@@ -70,6 +75,9 @@ public class UnitOfMeasureService {
 
         unit = repository.save(unit);
 
+        auditService.record("UNIT_OF_MEASURE_CREATED", "Unit of measure created",
+                "id=" + unit.getId() + ", name=" + unit.getName(), true);
+
         return getById(unit.getId());
     }
 
@@ -79,6 +87,8 @@ public class UnitOfMeasureService {
                 .orElseThrow(() -> new NotFoundException("Unit of measure not found"));
 
         repository.delete(unit);
+
+        auditService.record("UNIT_OF_MEASURE_DELETED", "Unit of measure deleted", "id=" + id, true);
     }
 
     private UnitOfMeasureResponse toResponse(UnitOfMeasure unit){

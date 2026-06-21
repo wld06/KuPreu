@@ -8,6 +8,7 @@ import com.kupreu.api.DTOs.Store.StoreResponse;
 import com.kupreu.api.entity.PostalCode;
 import com.kupreu.api.entity.Store;
 import com.kupreu.api.entity.SupermarketChain;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.repository.PostalCodeRepository;
 import com.kupreu.api.repository.StoreRepository;
 import com.kupreu.api.repository.SupermarketChainRepository;
@@ -26,6 +27,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final SupermarketChainRepository smChainRepository;
     private final PostalCodeRepository postalCodeRepository;
+    private final AuditService auditService;
 
     public List<StoreResponse> getAll(){
         return storeRepository.findAll()
@@ -61,6 +63,9 @@ public class StoreService {
 
         store = storeRepository.save(store);
 
+        auditService.record("STORE_CREATED", "Store created",
+                "id=" + store.getId() + ", address=" + store.getAddress(), true);
+
         return getById(store.getId());
     }
 
@@ -91,6 +96,9 @@ public class StoreService {
         store.setAddress(request.getAddress());
         storeRepository.save(store);
 
+        auditService.record("STORE_UPDATED", "Store updated",
+                "id=" + id + ", address=" + store.getAddress(), true);
+
         return getById(store.getId());
     }
 
@@ -100,6 +108,8 @@ public class StoreService {
                 .orElseThrow(() -> new NotFoundException("Store not found"));
 
         storeRepository.delete(store);
+
+        auditService.record("STORE_DELETED", "Store deleted", "id=" + id, true);
     }
 
     private StoreResponse toResponse(Store store){

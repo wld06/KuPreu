@@ -12,6 +12,7 @@ import com.kupreu.api.DTOs.Category.CategoryResponse;
 import com.kupreu.api.DTOs.Subcategory.SubcategoryRequest;
 import com.kupreu.api.DTOs.Subcategory.SubcategoryResponse;
 import com.kupreu.api.DTOs.Subcategory.SubcategoryWithCategory;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.entity.Category;
 import com.kupreu.api.entity.Subcategory;
 import com.kupreu.api.repository.CategoryRepository;
@@ -25,6 +26,7 @@ import lombok.AllArgsConstructor;
 public class SubcategoryService {
     private final SubcategoryRepository subcategoryRepository;
     private final CategoryRepository categoryRepository;
+    private final AuditService auditService;
 
     public SubcategoryWithCategory getById(UUID id){
         Subcategory sub =  subcategoryRepository.findById(id)
@@ -37,6 +39,7 @@ public class SubcategoryService {
         Subcategory subcategory = subcategoryRepository.findById(id)
                                     .orElseThrow(() -> new NotFoundException("Subcategory with id " + id + " does not exist"));
         subcategoryRepository.delete(subcategory);
+        auditService.record("SUBCATEGORY_DELETED", "Subcategory deleted", "id=" + id, true);
     }
 
     @Transactional
@@ -51,6 +54,9 @@ public class SubcategoryService {
         subcategory.setCategory(category);
 
         subcategoryRepository.save(subcategory);
+
+        auditService.record("SUBCATEGORY_UPDATED", "Subcategory updated",
+                "id=" + id + ", name=" + subcategory.getName(), true);
 
         return toResponseWithCategory(subcategory);
     }
@@ -73,6 +79,9 @@ public class SubcategoryService {
                 .category(category)
                 .build()
         );
+
+        auditService.record("SUBCATEGORY_CREATED", "Subcategory created",
+                "id=" + subcategory.getId() + ", name=" + subcategory.getName(), true);
 
         return toResponseWithCategory(subcategory);
     }

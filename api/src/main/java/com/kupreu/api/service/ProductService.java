@@ -19,6 +19,7 @@ import com.kupreu.api.entity.Brand;
 import com.kupreu.api.entity.Product;
 import com.kupreu.api.entity.Subcategory;
 import com.kupreu.api.entity.UnitOfMeasure;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.repository.BrandRepository;
 import com.kupreu.api.repository.ProductRepository;
 import com.kupreu.api.repository.SubcategoryRepository;
@@ -34,6 +35,7 @@ public class ProductService {
     private final BrandRepository brandRepository;
     private final SubcategoryRepository subcategoryRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
+    private final AuditService auditService;
 
     public List<ProductResponse> getProductsFromAllBrands() {
         return productRepository.findAll()
@@ -48,6 +50,7 @@ public class ProductService {
             throw new NotFoundException("Product not found");
         }
         productRepository.deleteById(id);
+        auditService.record("PRODUCT_DELETED", "Product deleted", "id=" + id, true);
     }
 
     @Transactional
@@ -73,7 +76,10 @@ public class ProductService {
         product.setBrand(brand);
         product.setUnitOfMeasure(unitOfMeasure);
 
-        return toResponse(productRepository.save(product));
+        product = productRepository.save(product);
+        auditService.record("PRODUCT_UPDATED", "Product updated",
+                "id=" + product.getId() + ", name=" + product.getName(), true);
+        return toResponse(product);
     }
 
     @Transactional
@@ -98,7 +104,10 @@ public class ProductService {
             .unitOfMeasure(unitOfMeasure)
             .build();
 
-        return toResponse(productRepository.save(product));
+        product = productRepository.save(product);
+        auditService.record("PRODUCT_CREATED", "Product created",
+                "id=" + product.getId() + ", name=" + product.getName(), true);
+        return toResponse(product);
     }
 
     public List<ProductResponse> getProductsFromBrand(String brandName) {

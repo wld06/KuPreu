@@ -5,6 +5,7 @@ import com.kupreu.api.exception.ConflictException;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import com.kupreu.api.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kupreu.api.DTOs.AuthResponse;
 import com.kupreu.api.DTOs.LoginRequest;
 import com.kupreu.api.DTOs.RegisterRequest;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.config.security.JwtProvider;
 import com.kupreu.api.repository.UserRepository;
 
@@ -26,6 +28,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
+    private final AuditService auditService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -50,6 +53,9 @@ public class AuthService {
 
         String token = jwtProvider.generateToken(user.getEmail());
 
+        auditService.record("USER_REGISTERED", user.getEmail(),
+                "New user registered", null, true);
+
         return AuthResponse.builder()
                 .token(token)
                 .email(user.getEmail())
@@ -59,12 +65,22 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        } catch (AuthenticationException ex) {
+            auditService.record("LOGIN_FAILED", request.getEmail(),
+                    "Failed login attempt", ex.getClass().getSimpleName(), false);
+            throw ex;
+        }
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         String token = jwtProvider.generateToken(user.getEmail());
+
+        auditService.record("LOGIN_SUCCESS", user.getEmail(),
+                "User logged in", null, true);
 
         return AuthResponse.builder()
                 .token(token)

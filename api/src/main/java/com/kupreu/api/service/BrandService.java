@@ -10,6 +10,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.repository.BrandRepository;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class BrandService {
     private final BrandRepository brandRepository;
+    private final AuditService auditService;
 
     public List<BrandResponse> getAll(String brandName){
 
@@ -59,6 +61,9 @@ public class BrandService {
 
         brandRepository.save(brand);
 
+        auditService.record("BRAND_UPDATED", "Brand updated",
+                "id=" + id + ", name=" + brand.getName(), true);
+
         return getById(brand.getId());
     }
 
@@ -68,6 +73,8 @@ public class BrandService {
                 .orElseThrow(() -> new NotFoundException("Brand not found"));
 
         brandRepository.delete(brand);
+
+        auditService.record("BRAND_DELETED", "Brand deleted", "id=" + id, true);
     }
 
     @Transactional
@@ -81,6 +88,9 @@ public class BrandService {
                         .build();
 
         Brand savedBrand = brandRepository.save(brand);
+
+        auditService.record("BRAND_CREATED", "Brand created",
+                "id=" + savedBrand.getId() + ", name=" + savedBrand.getName(), true);
 
         return toResponse(savedBrand);
     }

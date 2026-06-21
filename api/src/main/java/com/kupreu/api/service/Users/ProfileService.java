@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kupreu.api.DTOs.PostalCodeDTO;
 import com.kupreu.api.DTOs.Profile.PasswordRequest;
 import com.kupreu.api.DTOs.Profile.ProfileResponse;
+import com.kupreu.api.audit.AuditService;
 import com.kupreu.api.entity.User;
 import com.kupreu.api.repository.UserRepository;
 
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class ProfileService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditService auditService;
 
     public ProfileResponse getMyProfile(String username) {
         User user = userRepository.findByEmail(username)
@@ -87,10 +89,15 @@ public class ProfileService {
                         .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!passwordEncoder.matches(request.getActualPassword(), user.getPassword())){
+            auditService.record("PASSWORD_CHANGE_FAILED", user.getEmail(),
+                    "Wrong current password on change attempt", null, false);
             throw new BadRequestException("Current password incorrect");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+
+        auditService.record("PASSWORD_CHANGED", user.getEmail(),
+                "User changed password", null, true);
     }
 }
