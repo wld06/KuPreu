@@ -1,24 +1,30 @@
-# ---- Build stage: compile the jar ----
-FROM eclipse-temurin:21-jdk AS build
+# Stage 1: Build
+FROM maven:3.9-eclipse-temurin-17-alpine AS builder
+
+WORKDIR /build
+
+# Copy maven
+COPY pom.xml .
+COPY src ./src
+
+# Compile
+RUN mvn -B -DskipTests clean package
+
+# Stage 2: Runtime
+FROM eclipse-temurin:17-jre-alpine
+
 WORKDIR /app
 
-# Cache dependencies first (only re-runs if pom changes)
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
-RUN ./mvnw -q -B dependency:go-offline
+COPY --from=builder /build/target/*.jar app.jar
 
-# Build the app
-COPY src/ src/
-RUN ./mvnw -q -B clean package -DskipTests
-
-# ---- Runtime stage: slim image, just the jar ----
-FROM eclipse-temurin:21-jre AS runtime
-WORKDIR /app
-
-# Non-root user
-RUN useradd -r -u 1001 appuser
-COPY --from=build /app/target/*.jar app.jar
-USER appuser
+# Metadata
+LABEL maintainer="ratoncaton12@gmail.com"
+LABEL description="An API for storing and comparing daily shopping lists"
 
 EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

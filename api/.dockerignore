@@ -1,11 +1,33 @@
-target/
-.git/
+# Git
+.git
 .gitignore
+.gitattributes
+
+# Maven
+target/
+.m2/
+*.log
+
+# IDE
 .idea/
 .vscode/
 *.iml
-HELP.md
-ENDPOINTS.txt
-application-local.properties
-.env
-.env.*
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CI/CD
+.github/
+
+# Documentation
+README.md
+LICENSE
+docs/
+
+# Node (si lo usas)
+node_modules/
+package-lock.json
