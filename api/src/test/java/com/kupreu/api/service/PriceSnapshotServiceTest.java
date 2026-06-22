@@ -1,5 +1,7 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +41,7 @@ class PriceSnapshotServiceTest {
     @Mock private StoreRepository storeRepository;
     @Mock private DateDIMRepository dateDIMRepository;
     @Mock private ProductRepository productRepository;
+    @Mock private AuditService auditService;
     @InjectMocks private PriceSnapshotService priceSnapshotService;
 
     private static final UUID PRODUCT_ID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");

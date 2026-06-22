@@ -1,5 +1,7 @@
 package com.kupreu.api.controller;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -51,6 +53,10 @@ class ProfileControllerTest {
 
     @MockitoBean
     private ProfileService profileService;
+
+    @MockitoBean
+    @SuppressWarnings("unused")
+    private AuditService auditService;
 
     @MockitoBean
     @SuppressWarnings("unused")

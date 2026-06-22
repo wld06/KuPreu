@@ -1,5 +1,7 @@
 package com.kupreu.api.controller;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -45,6 +47,10 @@ class SubcategoryControllerTest {
 
     @MockitoBean
     private SubcategoryService subcategoryService;
+
+    @MockitoBean
+    @SuppressWarnings("unused")
+    private AuditService auditService;
 
     @MockitoBean
     @SuppressWarnings("unused")

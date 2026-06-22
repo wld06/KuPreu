@@ -1,5 +1,7 @@
 package com.kupreu.api.controller;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +52,10 @@ class PriceSnapshotControllerTest {
 
     @MockitoBean
     private PriceSnapshotService priceSnapshotService;
+
+    @MockitoBean
+    @SuppressWarnings("unused")
+    private AuditService auditService;
 
     @MockitoBean
     @SuppressWarnings("unused")

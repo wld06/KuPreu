@@ -1,5 +1,7 @@
 package com.kupreu.api.service.Users;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
@@ -28,6 +30,7 @@ class ProfileServiceTest {
 
     @Mock private UserRepository userRepository;
     @Mock private PasswordEncoder passwordEncoder;
+    @Mock private AuditService auditService;
     @InjectMocks private ProfileService profileService;
 
     private static final UUID ID = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");

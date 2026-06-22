@@ -1,5 +1,7 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,6 +48,7 @@ class ShoppingListServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private PriceSnapshotRepository psRepository;
     @Mock private ShoppingListItemRepository sliRepository;
+    @Mock private AuditService auditService;
     @InjectMocks private ShoppingListService service;
 
     private static final String EMAIL = "user@kupreu.com";

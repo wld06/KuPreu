@@ -1,5 +1,7 @@
 package com.kupreu.api.controller;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -55,6 +57,10 @@ class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    @SuppressWarnings("unused")
+    private AuditService auditService;
 
     @MockitoBean
     @SuppressWarnings("unused")

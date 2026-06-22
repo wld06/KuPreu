@@ -1,5 +1,7 @@
 package com.kupreu.api.controller;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,6 +46,10 @@ class AuthControllerTest {
 
     @MockitoBean
     private AuthService authService;
+
+    @MockitoBean
+    @SuppressWarnings("unused")
+    private AuditService auditService;
 
     @MockitoBean
     @SuppressWarnings("unused")

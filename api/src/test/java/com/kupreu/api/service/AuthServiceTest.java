@@ -1,5 +1,7 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,6 +38,7 @@ class AuthServiceTest {
     @Mock private JwtProvider jwtProvider;
     @Mock private AuthenticationManager authenticationManager;
 
+    @Mock private AuditService auditService;
     @InjectMocks private AuthService authService;
 
     private RegisterRequest registerReq() {

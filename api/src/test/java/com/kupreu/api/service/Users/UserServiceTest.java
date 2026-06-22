@@ -1,5 +1,7 @@
 package com.kupreu.api.service.Users;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +34,7 @@ import com.kupreu.api.repository.UserRepository;
 class UserServiceTest {
 
     @Mock private UserRepository userRepository;
+    @Mock private AuditService auditService;
     @InjectMocks private UserService userService;
 
     private static final UUID ID = UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc");

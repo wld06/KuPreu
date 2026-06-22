@@ -1,5 +1,7 @@
 package com.kupreu.api.service;
 
+import com.kupreu.api.audit.AuditService;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +43,7 @@ class ProductServiceTest {
     @Mock private BrandRepository brandRepository;
     @Mock private SubcategoryRepository subcategoryRepository;
     @Mock private UnitOfMeasureRepository unitOfMeasureRepository;
+    @Mock private AuditService auditService;
     @InjectMocks private ProductService productService;
 
     private static final UUID ID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
