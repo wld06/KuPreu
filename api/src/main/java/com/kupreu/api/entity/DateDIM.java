@@ -17,6 +17,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Date dimension entity used to reference points in time from price snapshots.
+ * Storing dates as their own rows lets several snapshots share the same instant.
+ */
 @Entity
 @Table(name = "date_dim")
 @Getter
@@ -27,11 +31,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DateDIM {
+    /** Surrogate primary key, generated as a random UUID. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
     private UUID id;
 
+    /** The unique date/time value this dimension row represents. */
     @Column(nullable = false, unique = true)
     private LocalDateTime date;
 }

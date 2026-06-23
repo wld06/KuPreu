@@ -7,6 +7,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * Request payload for creating or updating a product, with bean-validation constraints
+ * and references to the related subcategory, brand and unit of measure.
+ */
 @Data
 public class ProductRequest {
     @NotBlank(message = "Name is required")

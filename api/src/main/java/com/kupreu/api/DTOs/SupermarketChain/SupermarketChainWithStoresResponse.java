@@ -7,6 +7,9 @@ import lombok.Data;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Response payload representing a supermarket chain together with its stores.
+ */
 @Data
 @Builder
 public class SupermarketChainWithStoresResponse {

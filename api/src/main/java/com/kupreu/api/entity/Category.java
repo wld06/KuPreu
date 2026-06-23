@@ -18,6 +18,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * JPA entity representing a top-level product category.
+ * Each category groups one or more {@link Subcategory} entries.
+ */
 @Entity
 @Table(name = "category")
 @Getter
@@ -29,14 +33,17 @@ import lombok.ToString;
 @AllArgsConstructor
 public class Category {
 
+    /** Surrogate primary key, generated as a random UUID. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
     private UUID Id;
 
+    /** Human-readable category name; must be unique and non-null. */
     @Column(nullable = false, unique = true)
     private String name;
 
+    /** Subcategories that belong to this category. */
     @OneToMany(mappedBy = "category")
     @ToString.Exclude
     private List<Subcategory> subcategories;

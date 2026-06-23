@@ -6,6 +6,9 @@ import lombok.Data;
 
 import java.util.UUID;
 
+/**
+ * Response payload representing a shopping-list item: its quantity and the associated price snapshot.
+ */
 @Data
 @Builder
 public class ShoppingListItemResponse {

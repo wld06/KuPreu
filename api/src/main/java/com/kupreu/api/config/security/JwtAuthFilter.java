@@ -16,12 +16,29 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Per-request filter that authenticates callers from a Bearer JWT.
+ * When a valid token is present it loads the user and populates the
+ * {@link SecurityContextHolder}; requests without a token pass through
+ * unauthenticated and any failure clears the security context.
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter{
     private final JwtProvider jwtProvider;
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Reads the {@code Authorization} header, validates the Bearer token and,
+     * on success, stores the authenticated user in the security context before
+     * continuing the filter chain.
+     *
+     * @param request     the incoming HTTP request
+     * @param response    the HTTP response
+     * @param filterChain the remaining filter chain
+     * @throws ServletException if the chain fails
+     * @throws IOException      if an I/O error occurs while processing the chain
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

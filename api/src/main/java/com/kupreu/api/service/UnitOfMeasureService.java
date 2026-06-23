@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Application service holding the business logic for {@link UnitOfMeasure} management.
+ * Every mutating operation is recorded through the {@link AuditService}.
+ */
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
@@ -23,6 +27,11 @@ public class UnitOfMeasureService {
     private final UnitOfMeasureRepository repository;
     private final AuditService auditService;
 
+    /**
+     * Returns all units of measure.
+     *
+     * @return every unit as a response DTO
+     */
     public List<UnitOfMeasureResponse> getAll(){
         return repository.findAll()
                 .stream()
@@ -30,6 +39,13 @@ public class UnitOfMeasureService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Looks up a single unit of measure by its identifier.
+     *
+     * @param id the unit identifier
+     * @return the matching unit as a response DTO
+     * @throws NotFoundException if no unit has the given id
+     */
     public UnitOfMeasureResponse getById(UUID id){
         UnitOfMeasure unit = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Unit of measure not found"));
@@ -37,6 +53,14 @@ public class UnitOfMeasureService {
         return toResponse(unit);
     }
 
+    /**
+     * Updates the name and/or symbol of an existing unit of measure.
+     *
+     * @param id      the unit identifier
+     * @param request the new unit data
+     * @return the updated unit as a response DTO
+     * @throws NotFoundException if no unit has the given id
+     */
     @Transactional
     public UnitOfMeasureResponse update(UUID id, UnitOfMeasureRequest request){
         UnitOfMeasure unit = repository.findById(id)
@@ -58,6 +82,13 @@ public class UnitOfMeasureService {
         return getById(unit.getId());
     }
 
+    /**
+     * Creates a new unit of measure.
+     *
+     * @param request the unit data; both name and symbol are required
+     * @return the created unit as a response DTO
+     * @throws BadRequestException if the name or symbol is missing or blank
+     */
     @Transactional
     public UnitOfMeasureResponse create(UnitOfMeasureRequest request){
         if (request.getName() == null || request.getName().isBlank()){
@@ -81,6 +112,12 @@ public class UnitOfMeasureService {
         return getById(unit.getId());
     }
 
+    /**
+     * Deletes the unit of measure with the given identifier.
+     *
+     * @param id the unit identifier
+     * @throws NotFoundException if no unit has the given id
+     */
     @Transactional
     public void delete(UUID id){
         UnitOfMeasure unit = repository.findById(id)
@@ -91,6 +128,7 @@ public class UnitOfMeasureService {
         auditService.record("UNIT_OF_MEASURE_DELETED", "Unit of measure deleted", "id=" + id, true);
     }
 
+    /** Maps a {@link UnitOfMeasure} entity to its response DTO. */
     private UnitOfMeasureResponse toResponse(UnitOfMeasure unit){
         return UnitOfMeasureResponse.builder()
                 .id(unit.getId())

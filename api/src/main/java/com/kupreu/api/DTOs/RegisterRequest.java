@@ -8,6 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Request payload for registering a new user, with bean-validation constraints on
+ * e-mail, name, username and password complexity.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

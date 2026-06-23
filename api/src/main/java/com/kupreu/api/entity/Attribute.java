@@ -16,6 +16,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * JPA entity representing a product attribute (for example "Organic" or "Gluten-free").
+ * Attribute names are unique across the catalog.
+ */
 @Entity
 @Table(name = "attribute")
 @Getter
@@ -27,11 +31,13 @@ import lombok.ToString;
 @AllArgsConstructor
 public class Attribute {
 
+    /** Surrogate primary key, generated as a random UUID. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
     private UUID Id;
 
+    /** Human-readable attribute name; must be unique and non-null. */
     @Column(nullable = false, unique = true)
     private String name;
 }

@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Spring Data JPA repository for {@link Attribute} entities.
+ * Provides the standard CRUD operations keyed by UUID.
+ */
 @Repository
 public interface AttributeRepository extends JpaRepository<Attribute, UUID> {
 }

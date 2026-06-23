@@ -5,6 +5,9 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Response payload representing a store, with its chain flattened to a name.
+ */
 @Data
 @Builder
 public class StoreResponse {

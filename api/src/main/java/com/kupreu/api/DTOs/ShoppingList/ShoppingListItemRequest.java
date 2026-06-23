@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+/**
+ * Request payload for adding an item to a shopping list: the chosen price snapshot
+ * and the desired quantity (at least 1).
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

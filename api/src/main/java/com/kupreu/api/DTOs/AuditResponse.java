@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.time.Instant;
 
+/**
+ * Response payload representing a single audit-log entry returned to administrators.
+ */
 @Data
 @Builder
 public class AuditResponse {

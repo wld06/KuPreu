@@ -8,6 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
+/**
+ * Request payload for creating a price snapshot, with bean-validation constraints.
+ * A {@code null} {@code dateEnd} indicates the price is still current.
+ */
 @Data
 public class PriceSnapshotRequest {
     @NotNull(message = "Product id is required")

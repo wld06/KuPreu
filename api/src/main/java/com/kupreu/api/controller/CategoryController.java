@@ -23,35 +23,69 @@ import com.kupreu.api.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * REST controller exposing category endpoints under {@code /api/categories}.
+ * Reads are public; create, update and delete require the {@code ADMIN} role.
+ */
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
-    
+
     private final CategoryService categoryService;
 
+    /**
+     * Returns all categories, each with its subcategories.
+     *
+     * @return HTTP 200 with the categories
+     */
     @GetMapping
     public ResponseEntity<List<CategoryWithSubcategoriesResponse>> getAll() {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
+    /**
+     * Returns a single category, with its subcategories, by id.
+     *
+     * @param id the category identifier
+     * @return HTTP 200 with the category
+     */
     @GetMapping("/{id}")
     public ResponseEntity<CategoryWithSubcategoriesResponse> getById(@PathVariable UUID id){
         return ResponseEntity.ok(categoryService.getById(id));
     }
 
+    /**
+     * Creates a new category. Requires the {@code ADMIN} role.
+     *
+     * @param request the validated category data
+     * @return HTTP 201 with the created category
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(request));
     }
 
+    /**
+     * Updates an existing category. Requires the {@code ADMIN} role.
+     *
+     * @param id      the category identifier
+     * @param request the validated category data
+     * @return HTTP 200 with the updated category
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> update(@PathVariable UUID id, @Valid @RequestBody CategoryRequest request){
         return ResponseEntity.ok(categoryService.update(id, request));
     }
 
+    /**
+     * Deletes a category. Requires the {@code ADMIN} role.
+     *
+     * @param id the category identifier
+     * @return HTTP 204 with no content
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable UUID id){

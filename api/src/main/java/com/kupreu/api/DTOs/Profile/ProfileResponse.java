@@ -8,6 +8,9 @@ import com.kupreu.api.DTOs.PostalCodeDTO;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Response payload representing a user's profile (excluding sensitive data such as the password).
+ */
 @Data
 @Builder
 public class ProfileResponse {

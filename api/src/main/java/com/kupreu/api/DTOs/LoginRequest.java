@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Request payload carrying login credentials (e-mail and password).
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -18,6 +18,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * JPA entity representing a subcategory nested under a {@link Category}.
+ */
 @Entity
 @Table(name = "subcategory")
 @Getter
@@ -29,14 +32,17 @@ import lombok.ToString;
 @AllArgsConstructor
 public class Subcategory {
 
+    /** Surrogate primary key, generated as a random UUID. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
     private UUID id;
 
+    /** Human-readable subcategory name; must be unique and non-null. */
     @Column(nullable = false, unique = true)
     private String name;
 
+    /** Parent category this subcategory belongs to. */
     @ManyToOne
     @JoinColumn(name = "id_category", nullable = false)
     @ToString.Exclude

@@ -22,6 +22,10 @@ import com.kupreu.api.service.Users.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * REST controller exposing administrative user-management endpoints under
+ * {@code /api/users}. Every endpoint requires the {@code ADMIN} role.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -30,6 +34,13 @@ public class UserController {
 
     //Only admins can access this endpoints to manage users
 
+    /**
+     * Returns a paginated list of all users. Requires the {@code ADMIN} role.
+     *
+     * @param page zero-based page index
+     * @param size page size
+     * @return HTTP 200 with a page of user profiles
+     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<ProfileResponse>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size){
@@ -37,6 +48,12 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    /**
+     * Deletes a user account. Requires the {@code ADMIN} role.
+     *
+     * @param id the user identifier
+     * @return HTTP 204 with no content
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
@@ -44,6 +61,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Grants or revokes admin privileges for a user. Requires the {@code ADMIN} role.
+     *
+     * @param id      the user identifier
+     * @param request the validated role data (admin flag)
+     * @return HTTP 200 with the updated role information
+     */
     @PutMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AdminResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody AdminRequest request) {

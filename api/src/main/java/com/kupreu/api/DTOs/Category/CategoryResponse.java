@@ -5,6 +5,9 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Response payload representing a category (without its subcategories).
+ */
 @Data
 @Builder
 public class CategoryResponse {

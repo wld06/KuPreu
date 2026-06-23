@@ -4,6 +4,9 @@ import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.NonNull;
 
+/**
+ * Request payload for updating the quantity of an existing shopping-list item (at least 1).
+ */
 @Data
 public class ShoppingListItemUpdateQtyRequest {
     @NonNull

@@ -20,6 +20,11 @@ import com.kupreu.api.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Application service that handles user authentication: registration and login.
+ * On success it issues a JWT through the {@link JwtProvider}; both outcomes are
+ * recorded through the {@link AuditService}.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -30,6 +35,13 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final AuditService auditService;
 
+    /**
+     * Registers a new user, hashing the password and issuing an initial token.
+     *
+     * @param request the registration data (e-mail, username, name and password)
+     * @return the authentication response with the issued token and user details
+     * @throws ConflictException if the e-mail or username is already in use
+     */
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -64,6 +76,14 @@ public class AuthService {
                 .build();
     }
 
+    /**
+     * Authenticates a user with e-mail and password and issues a fresh token.
+     *
+     * @param request the login credentials
+     * @return the authentication response with the issued token and user details
+     * @throws org.springframework.security.core.AuthenticationException if the credentials are invalid
+     * @throws NotFoundException if authentication succeeds but no matching user is found
+     */
     public AuthResponse login(LoginRequest request) {
         try {
             authenticationManager.authenticate(

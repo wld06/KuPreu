@@ -19,6 +19,11 @@ import com.kupreu.api.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Application service for administrative user management: listing users, deleting
+ * accounts and changing roles. Every mutating operation is recorded through the
+ * {@link AuditService}.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,12 +31,24 @@ public class UserService {
     private final UserRepository userRepository;
     private final AuditService auditService;
 
+    /**
+     * Returns a paginated list of all users.
+     *
+     * @param page zero-based page index
+     * @param size page size
+     * @return a page of user profiles
+     */
     public Page<ProfileResponse> getAllUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return userRepository.findAll(pageable)
                 .map(this::toProfileResponse);
     }
 
+    /**
+     * Deletes the user account with the given identifier.
+     *
+     * @param id the user identifier
+     */
     @Transactional
     public void deleteUser(UUID id){
         userRepository.deleteById(id);
@@ -39,6 +56,14 @@ public class UserService {
                 "User deleted", "id=" + id, true);
     }
 
+    /**
+     * Grants or revokes administrator privileges for a user.
+     *
+     * @param id      the user identifier
+     * @param isAdmin {@code true} to grant admin rights, {@code false} to revoke them
+     * @return the updated role information as a response DTO
+     * @throws NotFoundException if no user has the given id
+     */
     @Transactional
     public AdminResponse updateUserRole(UUID id, boolean isAdmin){
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
@@ -55,6 +80,7 @@ public class UserService {
                 .build();
     }
 
+    /** Maps a {@link User} entity to its profile response DTO. */
     private ProfileResponse toProfileResponse(User user) {
         return ProfileResponse.builder()
                 .id(user.getId())

@@ -28,6 +28,12 @@ import com.kupreu.api.repository.StoreRepository;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Application service holding the business logic for {@link PriceSnapshot} records:
+ * querying price history, creating new snapshots, closing them with an end date and
+ * computing the cheapest active price. Date values are de-duplicated through
+ * {@link DateDIMRepository}, and mutating operations are recorded via the {@link AuditService}.
+ */
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
@@ -38,6 +44,13 @@ public class PriceSnapshotService {
     private final ProductRepository productRepository;
     private final AuditService auditService;
 
+    /**
+     * Returns the price history of a product, most recent first.
+     *
+     * @param productId the product identifier
+     * @return the product's snapshots ordered by start date descending
+     * @throws NotFoundException if the product has no snapshots
+     */
     public List<PriceSnapshotResponse> getPriceSnapshotByProductId(UUID productId){
         List<PriceSnapshot> priceSnapshots = priceSnapshotRepository.findByProductId(productId);
         if (priceSnapshots == null || priceSnapshots.isEmpty()) {
@@ -50,6 +63,14 @@ public class PriceSnapshotService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the price history of a product at a specific store, most recent first.
+     *
+     * @param productId the product identifier
+     * @param storeId   the store identifier
+     * @return the matching snapshots ordered by start date descending
+     * @throws NotFoundException if no snapshots exist for that product and store
+     */
     public List<PriceSnapshotResponse> getPriceSnapshotsByProductIdAndStoreId(UUID productId, UUID storeId){
         List<PriceSnapshot> priceSnapshots = priceSnapshotRepository.findByProductIdAndStoreId(productId, storeId);
         if (priceSnapshots == null || priceSnapshots.isEmpty()) {
@@ -62,6 +83,15 @@ public class PriceSnapshotService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Closes a price snapshot by setting the date it stopped being valid,
+     * reusing an existing date-dimension row when one matches.
+     *
+     * @param dateEnd the date the price stopped being valid
+     * @param id      the composite identifier of the snapshot to close
+     * @return the updated snapshot as a response DTO
+     * @throws NotFoundException if no snapshot has the given id
+     */
     @Transactional
     public PriceSnapshotResponse updateEndDate(LocalDateTime dateEnd, PriceSnapshotId id){
         PriceSnapshot priceSnapshot = priceSnapshotRepository.findById(id)
@@ -77,6 +107,14 @@ public class PriceSnapshotService {
         return toResponse(saved);
     }
 
+    /**
+     * Creates a new price snapshot for a product at a store, resolving (or creating)
+     * the referenced product, store and date-dimension rows.
+     *
+     * @param request the snapshot data (product, store, start/end dates and price)
+     * @return the created snapshot as a response DTO
+     * @throws NotFoundException if the referenced product or store does not exist
+     */
     @Transactional
     public PriceSnapshotResponse create(PriceSnapshotRequest request){
         Product product = productRepository.findById(request.getProductId())
@@ -115,6 +153,14 @@ public class PriceSnapshotService {
         return toResponse(saved);
     }
 
+    /**
+     * Returns the cheapest currently-valid price for a product, i.e. the lowest-priced
+     * snapshot with no end date.
+     *
+     * @param productId the product identifier
+     * @return the cheapest active snapshot as a response DTO
+     * @throws NotFoundException if the product has no snapshots, or none are still active
+     */
     public PriceSnapshotResponse getCheapest(UUID productId){
         List<PriceSnapshot> priceSnapshots = priceSnapshotRepository.findByProductId(productId);
         if (priceSnapshots == null || priceSnapshots.isEmpty()) {
@@ -128,6 +174,7 @@ public class PriceSnapshotService {
             .orElseThrow(() -> new NotFoundException("No active price snapshots with product id: " + productId));
     }
 
+    /** Maps a {@link PriceSnapshot} entity to its response DTO, including store and dates. */
     private PriceSnapshotResponse toResponse(PriceSnapshot priceSnapshot){
         return PriceSnapshotResponse.builder()
             .uuid(priceSnapshot.getUuid())

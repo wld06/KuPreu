@@ -9,6 +9,10 @@ import com.kupreu.api.DTOs.Store.StoreResponse;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Response payload representing a price snapshot, including the store and the
+ * start/end dates of the price's validity window.
+ */
 @Data
 @Builder
 public class PriceSnapshotResponse {

@@ -18,6 +18,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * JPA entity representing a supermarket chain (brand) that owns several {@link Store} branches.
+ */
 @Entity
 @Table(name = "supermarket_chain")
 @Getter
@@ -29,14 +32,17 @@ import lombok.ToString;
 @AllArgsConstructor
 public class SupermarketChain {
 
+    /** Surrogate primary key, generated as a random UUID. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
     private UUID Id;
 
+    /** Human-readable chain name; must be unique and non-null. */
     @Column(nullable = false, unique = true)
     private String name;
 
+    /** Stores operated by this chain. */
     @OneToMany(mappedBy = "supermarketChain")
     @ToString.Exclude
     private List<Store> supermarkets;

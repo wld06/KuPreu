@@ -7,7 +7,11 @@ import org.springframework.stereotype.Repository;
 
 import com.kupreu.api.entity.Store;
 
+/**
+ * Spring Data JPA repository for {@link Store} entities.
+ * Provides the standard CRUD operations keyed by UUID.
+ */
 @Repository
 public interface StoreRepository extends JpaRepository<Store, UUID> {
-    
+
 }

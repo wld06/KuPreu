@@ -7,6 +7,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Response payload returned after a successful registration or login,
+ * carrying the issued JWT and the authenticated user's basic details.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

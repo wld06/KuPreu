@@ -8,6 +8,9 @@ import com.kupreu.api.DTOs.Subcategory.SubcategoryResponse;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Response payload representing a category together with its subcategories.
+ */
 @Data
 @Builder
 public class CategoryWithSubcategoriesResponse {

@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Request payload for creating or renaming a shopping list, with bean-validation constraints.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

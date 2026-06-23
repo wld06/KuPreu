@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.UUID;
 
+/**
+ * Response payload representing a unit of measure (name and symbol).
+ */
 @Data
 @Builder
 public class UnitOfMeasureResponse {

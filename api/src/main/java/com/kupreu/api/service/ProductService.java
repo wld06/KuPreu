@@ -27,6 +27,12 @@ import com.kupreu.api.repository.UnitOfMeasureRepository;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Application service holding the business logic for {@link Product} management:
+ * CRUD operations plus filtered, paginated and brand/EAN-based lookups. Related
+ * entities (subcategory, brand, unit of measure) are resolved on write, and every
+ * mutating operation is recorded through the {@link AuditService}.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -37,6 +43,11 @@ public class ProductService {
     private final UnitOfMeasureRepository unitOfMeasureRepository;
     private final AuditService auditService;
 
+    /**
+     * Returns every product across all brands.
+     *
+     * @return all products as response DTOs
+     */
     public List<ProductResponse> getProductsFromAllBrands() {
         return productRepository.findAll()
                 .stream()
@@ -44,6 +55,12 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Deletes the product with the given identifier.
+     *
+     * @param id the product identifier
+     * @throws NotFoundException if no product has the given id
+     */
     @Transactional
     public void delete(UUID id) {
         if (!productRepository.existsById(id)){
@@ -53,6 +70,15 @@ public class ProductService {
         auditService.record("PRODUCT_DELETED", "Product deleted", "id=" + id, true);
     }
 
+    /**
+     * Updates an existing product and its related entities.
+     *
+     * @param id      the product identifier
+     * @param request the new product data, including subcategory, brand and unit references
+     * @return the updated product as a response DTO
+     * @throws NotFoundException if the product or any referenced entity does not exist
+     * @throws ConflictException if the new name collides with another existing product
+     */
     @Transactional
     public ProductResponse update(UUID id, ProductRequest request) {
         Product product = productRepository.findById(id)
@@ -82,6 +108,14 @@ public class ProductService {
         return toResponse(product);
     }
 
+    /**
+     * Creates a new product, resolving its subcategory, brand and unit of measure.
+     *
+     * @param request the product data
+     * @return the created product as a response DTO
+     * @throws ConflictException if a product with the same name already exists
+     * @throws NotFoundException if any referenced entity does not exist
+     */
     @Transactional
     public ProductResponse create(ProductRequest request){
        if (productRepository.existsByName(request.getName())){
@@ -110,6 +144,12 @@ public class ProductService {
         return toResponse(product);
     }
 
+    /**
+     * Returns all products belonging to a brand identified by name.
+     *
+     * @param brandName the brand name
+     * @return the matching products as response DTOs
+     */
     public List<ProductResponse> getProductsFromBrand(String brandName) {
         return productRepository.findByBrandName(brandName)
                 .stream()
@@ -117,18 +157,43 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Looks up a single product by its identifier.
+     *
+     * @param id the product identifier
+     * @return the matching product as a response DTO
+     * @throws NotFoundException if no product has the given id
+     */
     public ProductResponse getProductById(UUID id){
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
         return toResponse(product);
     }
 
+    /**
+     * Looks up a single product by its EAN barcode.
+     *
+     * @param ean the EAN barcode
+     * @return the matching product as a response DTO
+     * @throws NotFoundException if no product has the given EAN
+     */
     public ProductResponse getByEan(String ean){
         Product product = productRepository.findByEan(ean)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
         return toResponse(product);
     }
 
+    /**
+     * Returns a paginated list of products matching the given optional filters.
+     * Any {@code null} or blank filter is ignored, so they can be combined freely.
+     *
+     * @param search        case-insensitive substring matched against the product name
+     * @param categoryId    restrict to products under this category
+     * @param subcategoryId restrict to products under this subcategory
+     * @param brandId       restrict to products of this brand
+     * @param pageable      pagination and sorting information
+     * @return a page of matching products as response DTOs
+     */
     public Page<ProductResponse> getProducts(String search, UUID categoryId, UUID subcategoryId, UUID brandId, Pageable pageable) {
         Specification<Product> spec = Specification.where(Specification.unrestricted());
 
@@ -155,6 +220,7 @@ public class ProductService {
         return productRepository.findAll(spec, pageable).map(this::toResponse);
     }
 
+    /** Maps a {@link Product} entity to its response DTO with related entity names. */
     private ProductResponse toResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())

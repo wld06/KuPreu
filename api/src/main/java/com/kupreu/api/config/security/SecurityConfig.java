@@ -26,6 +26,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Central Spring Security configuration for the API.
+ * Defines a stateless, JWT-based filter chain, security response headers, CORS,
+ * public versus protected endpoints, and the shared authentication beans.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -35,9 +40,19 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
+    /** Origins allowed to call the API via CORS; defaults to the local frontend. */
     @Value("${cors.allowed-origins:http://localhost:3000}")
     private List<String> allowedOrigins;
 
+    /**
+     * Builds the security filter chain: stateless sessions, hardened headers,
+     * public read endpoints, role-protected admin areas, and the JWT filter
+     * placed before the username/password filter.
+     *
+     * @param http the security builder
+     * @return the configured filter chain
+     * @throws Exception if the chain cannot be built
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -73,16 +88,34 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Exposes the Spring-managed authentication manager as a bean.
+     *
+     * @param config the authentication configuration
+     * @return the authentication manager
+     * @throws Exception if it cannot be resolved
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Provides the password encoder used to hash and verify credentials.
+     *
+     * @return a BCrypt-based password encoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Defines the CORS policy for {@code /api/**}: allowed origins, methods,
+     * headers, credentials and preflight cache duration.
+     *
+     * @return the CORS configuration source
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

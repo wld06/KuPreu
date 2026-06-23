@@ -5,6 +5,9 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Response payload representing a product, with related entities flattened to their names.
+ */
 @Data
 @Builder
 public class ProductResponse {

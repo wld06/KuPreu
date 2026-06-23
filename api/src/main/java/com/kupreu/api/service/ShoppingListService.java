@@ -21,6 +21,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Application service holding the business logic for {@link ShoppingList} and its items.
+ * <p>
+ * All operations are scoped to the authenticated user (identified by e-mail); a list
+ * that belongs to another user is reported as "not found" rather than forbidden, so
+ * existence is not leaked. Every mutating operation is recorded through the {@link AuditService}.
+ */
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
@@ -31,6 +38,13 @@ public class ShoppingListService {
     private final ShoppingListItemRepository sliRepository;
     private final AuditService auditService;
 
+    /**
+     * Returns every shopping list owned by the given user.
+     *
+     * @param username the authenticated user's e-mail
+     * @return the user's shopping lists as response DTOs
+     * @throws NotFoundException if no user matches the e-mail
+     */
     public List<ShoppingListResponse> getAll(String username){
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -41,12 +55,29 @@ public class ShoppingListService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Looks up a single shopping list owned by the given user.
+     *
+     * @param id       the shopping list identifier
+     * @param username the authenticated user's e-mail
+     * @return the matching shopping list as a response DTO
+     * @throws NotFoundException if the list does not exist or is not owned by the user
+     */
     public ShoppingListResponse getById(UUID id, String username){
         ShoppingList sl = getShoppingListIfAuthenticated(id, username);
 
         return toResponse(sl);
     }
 
+    /**
+     * Creates a new shopping list for the given user.
+     *
+     * @param request  the list data (name)
+     * @param username the authenticated user's e-mail
+     * @return the created shopping list as a response DTO
+     * @throws NotFoundException if no user matches the e-mail
+     * @throws ConflictException if the user already has a list with that name
+     */
     @Transactional
     public ShoppingListResponse create(ShoppingListRequest request, String username){
         User user = userRepository.findByEmail(username)
@@ -69,6 +100,15 @@ public class ShoppingListService {
         return toResponse(sl);
     }
 
+    /**
+     * Renames a shopping list owned by the given user.
+     *
+     * @param id       the shopping list identifier
+     * @param request  the new list data (name)
+     * @param username the authenticated user's e-mail
+     * @return the updated shopping list as a response DTO
+     * @throws NotFoundException if the list does not exist or is not owned by the user
+     */
     @Transactional
     public ShoppingListResponse update(UUID id, ShoppingListRequest request, String username){
         ShoppingList sl = getShoppingListIfAuthenticated(id, username);
@@ -83,6 +123,13 @@ public class ShoppingListService {
         return toResponse(sl);
     }
 
+    /**
+     * Deletes a shopping list owned by the given user.
+     *
+     * @param id       the shopping list identifier
+     * @param username the authenticated user's e-mail
+     * @throws NotFoundException if the list does not exist or is not owned by the user
+     */
     @Transactional
     public void delete(UUID id, String username){
         ShoppingList sl = getShoppingListIfAuthenticated(id, username);
@@ -92,6 +139,15 @@ public class ShoppingListService {
         auditService.record("SHOPPING_LIST_DELETED", username, "Shopping list deleted", "id=" + id, true);
     }
 
+    /**
+     * Returns the shopping list with, for each item, the cheapest currently-valid
+     * price found across all stores for that product.
+     *
+     * @param id       the shopping list identifier
+     * @param username the authenticated user's e-mail
+     * @return the shopping list with cheapest-price items
+     * @throws NotFoundException if the list does not exist or is not owned by the user
+     */
     public ShoppingListResponse getCheapestList(UUID id, String username){
 
         ShoppingList sl = getShoppingListIfAuthenticated(id, username);
@@ -110,6 +166,16 @@ public class ShoppingListService {
 
     // ITEMS
 
+    /**
+     * Adds an item to a shopping list. If the same price snapshot is already in the
+     * list, its quantity is increased instead of inserting a duplicate line.
+     *
+     * @param shoppingListId the shopping list identifier
+     * @param request        the item data (price snapshot uuid and quantity)
+     * @param username       the authenticated user's e-mail
+     * @return the updated shopping list as a response DTO
+     * @throws NotFoundException if the list (for this user) or the price snapshot does not exist
+     */
     @Transactional
     public ShoppingListResponse addItem(UUID shoppingListId, ShoppingListItemRequest request, String username){
         ShoppingList sl = getShoppingListIfAuthenticated(shoppingListId, username);
@@ -146,6 +212,17 @@ public class ShoppingListService {
         return toResponse(sl);
     }
 
+    /**
+     * Sets the quantity of an existing item within a shopping list.
+     *
+     * @param shoppingListId     the shopping list identifier
+     * @param shoppingListItemId the item identifier
+     * @param request            the new quantity
+     * @param username           the authenticated user's e-mail
+     * @return the updated shopping list as a response DTO
+     * @throws NotFoundException if the list (for this user) or the item does not exist,
+     *                           or the item does not belong to the list
+     */
     @Transactional
     public ShoppingListResponse updateQuantityItem(UUID shoppingListId, UUID shoppingListItemId, ShoppingListItemUpdateQtyRequest request, String username){
 
@@ -169,6 +246,16 @@ public class ShoppingListService {
         return toResponse(sl);
     }
 
+    /**
+     * Removes an item from a shopping list.
+     *
+     * @param shoppingListId     the shopping list identifier
+     * @param shoppingListItemId the item identifier
+     * @param username           the authenticated user's e-mail
+     * @return the updated shopping list as a response DTO
+     * @throws NotFoundException if the list (for this user) or the item does not exist,
+     *                           or the item does not belong to the list
+     */
     @Transactional
     public ShoppingListResponse deleteItem(UUID shoppingListId, UUID shoppingListItemId, String username){
         ShoppingList sl = getShoppingListIfAuthenticated(shoppingListId, username);
@@ -190,6 +277,16 @@ public class ShoppingListService {
 
     // HELPERS AND ASSIST FUNCTIONS
 
+    /**
+     * Loads a shopping list and verifies it belongs to the given user. To avoid
+     * leaking the existence of other users' lists, a list owned by someone else is
+     * reported the same way as a missing list.
+     *
+     * @param slId     the shopping list identifier
+     * @param username the authenticated user's e-mail
+     * @return the shopping list, guaranteed to belong to the user
+     * @throws NotFoundException if the list or user does not exist, or the list is not owned by the user
+     */
     private ShoppingList getShoppingListIfAuthenticated(UUID slId, String username){
         ShoppingList sl = repository.findById(slId)
                 .orElseThrow(() -> new NotFoundException("Shopping list not found"));
@@ -206,6 +303,7 @@ public class ShoppingListService {
         return sl;
     }
 
+    /** Maps an item to a response carrying the cheapest active price for its product. */
     private ShoppingListItemResponse toCheapestItem(ShoppingListItem item){
         return ShoppingListItemResponse.builder()
                 .id(item.getId())
@@ -216,12 +314,14 @@ public class ShoppingListService {
                 .build();
     }
 
+    /** Finds the cheapest currently-valid price for a product, or {@code null} if none. */
     private PriceSnapshotResponse findCheapest(UUID productId){
         return psRepository.findFirstByProductIdAndDateEndIsNullOrderByPriceAsc(productId)
                 .map(this::toPriceSnapshotResponse)
                 .orElse(null);
     }
 
+    /** Maps a {@link PriceSnapshot} entity to its response DTO (store, price and start date). */
     private PriceSnapshotResponse toPriceSnapshotResponse(PriceSnapshot ps){
         return PriceSnapshotResponse.builder()
                 .uuid(ps.getUuid())
@@ -242,6 +342,7 @@ public class ShoppingListService {
                 .build();
     }
 
+    /** Maps a {@link ShoppingList} entity to its response DTO, including its items. */
     private ShoppingListResponse toResponse(ShoppingList shoppingList){
         return ShoppingListResponse.builder()
                 .id(shoppingList.getId())
@@ -256,6 +357,7 @@ public class ShoppingListService {
                 .build();
     }
 
+    /** Maps a {@link ShoppingListItem} entity to its response DTO using its stored price snapshot. */
     private ShoppingListItemResponse toItemsResponse(ShoppingListItem item){
 
         PriceSnapshot ps = item.getPriceSnapshot();

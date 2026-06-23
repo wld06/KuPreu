@@ -5,6 +5,10 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * Request payload for changing a password, carrying the current password and the new
+ * one. The new password is validated for length and complexity.
+ */
 @Data
 public class PasswordRequest {
     @NotBlank(message = "Password is required")

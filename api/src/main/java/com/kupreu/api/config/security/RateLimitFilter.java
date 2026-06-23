@@ -20,12 +20,25 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Per-request filter that throttles authentication endpoints by client IP.
+ * It uses Bucket4j token buckets backed by Redis so limits are shared across
+ * instances. Only requests under {@code /api/auth} are rate limited.
+ */
 @Component
 @Order(1)
 public class RateLimitFilter extends OncePerRequestFilter{
+    /** Redis-backed store of per-IP token buckets. */
     private final ProxyManager<byte[]> buckets;
+    /** Configurable capacity and refill settings for each bucket. */
     private final RateLimitProperties props;
 
+    /**
+     * Builds the filter and its Redis-backed bucket store.
+     *
+     * @param redisClient the Lettuce client used to persist bucket state
+     * @param props       the rate-limit capacity and refill configuration
+     */
     public RateLimitFilter(RedisClient redisClient, RateLimitProperties props) {
         this.buckets = LettuceBasedProxyManager
                         .builderFor(redisClient)
@@ -33,6 +46,11 @@ public class RateLimitFilter extends OncePerRequestFilter{
         this.props = props;
     }
 
+    /**
+     * Builds the bucket configuration from the configured capacity and refill rate.
+     *
+     * @return the configuration applied to each per-IP bucket
+     */
     private BucketConfiguration bucketConfig(){
         return BucketConfiguration.builder()
                 .addLimit(Bandwidth.builder()
@@ -42,6 +60,17 @@ public class RateLimitFilter extends OncePerRequestFilter{
                 .build();
     }
 
+    /**
+     * Consumes one token from the caller's bucket for {@code /api/auth} requests.
+     * Responds with HTTP 429 when the bucket is empty and HTTP 503 if the bucket
+     * store cannot be reached; other requests bypass the limiter.
+     *
+     * @param request  the incoming HTTP request
+     * @param response the HTTP response
+     * @param chain    the remaining filter chain
+     * @throws ServletException if the chain fails
+     * @throws IOException      if an I/O error occurs while processing the chain
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {

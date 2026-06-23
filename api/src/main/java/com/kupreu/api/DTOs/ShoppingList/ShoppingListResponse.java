@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Response payload representing a shopping list along with its items.
+ */
 @Data
 @Builder
 public class ShoppingListResponse {

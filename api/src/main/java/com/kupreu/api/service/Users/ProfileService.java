@@ -19,6 +19,10 @@ import com.kupreu.api.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Application service exposing the authenticated user's profile data and
+ * password-change operation. Password changes are recorded through the {@link AuditService}.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,6 +31,13 @@ public class ProfileService {
     private final PasswordEncoder passwordEncoder;
     private final AuditService auditService;
 
+    /**
+     * Returns the profile of the currently authenticated user.
+     *
+     * @param username the authenticated user's e-mail
+     * @return the user's profile as a response DTO
+     * @throws NotFoundException if no user matches the e-mail
+     */
     public ProfileResponse getMyProfile(String username) {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -45,6 +56,13 @@ public class ProfileService {
                 .build();
     }
 
+    /**
+     * Returns the profile of a user identified by id.
+     *
+     * @param id the user identifier
+     * @return the user's profile as a response DTO
+     * @throws NotFoundException if no user has the given id
+     */
     public ProfileResponse getProfileById(UUID id) {
         User user = userRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException("User not found"));
@@ -64,6 +82,13 @@ public class ProfileService {
                 .build();
     }
 
+    /**
+     * Returns the profile of a user identified by e-mail.
+     *
+     * @param email the user's e-mail
+     * @return the user's profile as a response DTO
+     * @throws NotFoundException if no user matches the e-mail
+     */
     public ProfileResponse getProfileByEmail(String email){
         User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new NotFoundException("User not found"));
@@ -83,6 +108,14 @@ public class ProfileService {
                 .build();
     }
 
+    /**
+     * Changes the authenticated user's password after verifying the current one.
+     *
+     * @param userDetails the authenticated principal
+     * @param request     the current and new passwords
+     * @throws NotFoundException   if the user no longer exists
+     * @throws BadRequestException if the supplied current password is incorrect
+     */
     @Transactional
     public void updatePassword(UserDetails userDetails, PasswordRequest request){
         User user = userRepository.findByEmail(userDetails.getUsername())

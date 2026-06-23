@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * Request payload for creating or updating a category, with bean-validation constraints.
+ */
 @Data
 public class CategoryRequest {
     @NotBlank(message = "Name is required")
