@@ -26,7 +26,7 @@ KuPreu is a REST API that tracks supermarket product prices across chains and st
 - 🚦 **Rate limiting** — Redis-backed bucket4j token bucket on `/api/auth/**`, returns `429`; capacity/refill tunable via `rate.limit.*` (default 20 req/min per IP)
 - ✅ **DTO validation** — `spring-boot-starter-validation` on request records, with a `GlobalExceptionHandler`
 - 🌐 **Configurable CORS** — allowed origins driven by `CORS_ALLOWED_ORIGINS`
-- 📚 **OpenAPI / Swagger UI** — interactive docs via springdoc (off by default, enabled in the dev profile)
+- 📚 **OpenAPI / Swagger UI** — interactive docs via springdoc (off by default, toggle with `SWAGGER_ENABLED`)
 - 🐳 **Docker Compose** — one-command full stack (API + MySQL + Redis + MongoDB)
 
 ## Tech stack
@@ -79,7 +79,7 @@ API boots on `http://localhost:8080`. Flyway applies the migrations in `src/main
 curl http://localhost:8080/api/categories
 ```
 
-> Swagger UI is disabled by default (prod-safe). Enable it for local dev with `springdoc.api-docs.enabled=true` and `springdoc.swagger-ui.enabled=true`, then browse `http://localhost:8080/swagger-ui/index.html`.
+> Swagger UI is disabled by default (prod-safe). Enable it for local dev by setting `SWAGGER_ENABLED=true`, then browse `http://localhost:8080/swagger-ui/index.html`.
 
 ## Quick start
 
@@ -119,6 +119,7 @@ Copy `.env.example` to `.env` (Compose reads it automatically), or set the varia
 | `RATE_LIMIT_REFILL_TOKEN` | `20` | Tokens refilled per period |
 | `RATE_LIMIT_REFILL_PERIOD` | `PT1M` | Refill period (ISO-8601 duration) |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated allowed frontend origins |
+| `SWAGGER_ENABLED` | `false` | Expose OpenAPI docs + Swagger UI (`true` for dev) |
 
 > Compose provisions database `kupreu` with matching `kupreu`/`kupreu` credentials, a Redis 7 instance on `6379`, and a MongoDB 7 instance for audit logs.
 
